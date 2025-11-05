@@ -1,4 +1,5 @@
 package patterns.observer;
 
-public class IObserver {
+public interface IObserver {
+    void update(Object state);
 }

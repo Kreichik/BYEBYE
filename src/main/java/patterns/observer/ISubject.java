@@ -1,4 +1,7 @@
 package patterns.observer;
 
-public class ISubject {
+public interface ISubject {
+    void addObserver(IObserver o);
+    void removeObserver(IObserver o);
+    void notifyObservers();
 }
