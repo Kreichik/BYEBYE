@@ -64,11 +64,23 @@ public class GameEngine implements ISubject, Runnable {
                 case MOVE_RIGHT:
                     character.setVelX(5);
                     break;
+                case MOVE_UP:
+                    character.setVelY(-5);
+                    break;
+                case MOVE_DOWN:
+                    character.setVelY(5);
+                    break;
                 case STOP_MOVE_LEFT:
                     if (character.getVelX() < 0) character.setVelX(0);
                     break;
                 case STOP_MOVE_RIGHT:
                     if (character.getVelX() > 0) character.setVelX(0);
+                    break;
+                case STOP_MOVE_UP:
+                    if (character.getVelY() < 0) character.setVelY(0);
+                    break;
+                case STOP_MOVE_DOWN:
+                    if (character.getVelY() > 0) character.setVelY(0);
                     break;
                 case ATTACK:
                     character.performAttack(gameState);

@@ -37,10 +37,12 @@ public class CharacterFactory {
         Hero hero = null;
         switch (type) {
             case WARRIOR_LEFT:
-                hero = new Hero(id, 200, 450, "skins/knight_stay.png", "Warrior");
+                hero = new Hero(id, 300, 150, "skins/knight_stay.png", "Warrior");
+                hero.setAttackStrategy(new RangedAttack());
                 break;
             case ARCHER_RIGHT:
-                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 450, "skins/archer_stay.png", "Archer");
+                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "skins/archer_stay.png", "Archer");
+                hero.setAttackStrategy(new RangedAttack());
                 break;
         }
         if (hero != null) {
@@ -53,7 +55,7 @@ public class CharacterFactory {
         Boss boss = null;
         switch (type) {
             case FIRE_MAGE:
-                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 350, "skins/boss_skin1.png", "Fire Mage");
+                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "skins/boss_skin1.png", "Fire Mage");
                 boss.setAttackStrategy(new WaveAttack());
                 break;
         }

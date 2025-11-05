@@ -10,8 +10,10 @@ public class NetworkFacade {
     private GameServer server;
     private GameClient client;
     private GameEngine engine;
+    private RoleSelectionDialog.Role role;
 
     public void start(RoleSelectionDialog.Role role, String ip, GameState gameState, GamePanel gamePanel) {
+        this.role = role;
         if (role == RoleSelectionDialog.Role.BOSS) {
             engine = new GameEngine(gameState);
             engine.addObserver(gamePanel);
@@ -27,7 +29,10 @@ public class NetworkFacade {
     }
 
     public void sendActionToServer(PlayerAction action) {
-        if (client != null) {
+        if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
+            action.setClientId(0);
+            engine.addPlayerAction(action);
+        } else if (client != null) {
             client.sendAction(action);
         }
     }
