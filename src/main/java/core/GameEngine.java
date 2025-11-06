@@ -92,10 +92,7 @@ public class GameEngine implements ISubject, Runnable {
                     paused = false;
                     break;
                 case STRATEGY_MELEE:
-                    // Increase damage significantly, reset range baseline
-                    character.setAttackStrategy(new patterns.strategy.RangedAttack());
-                    // Melee concept: boost damage, reduce range a bit
-                    // Using setters via direct fields is not available; adjust via helper
+                    character.setAttackStrategy(new patterns.strategy.MeleeAttackStrategy());
                     adjustCharacterStats(character, +5, -200);
                     break;
                 case STRATEGY_RANGED:
@@ -103,7 +100,7 @@ public class GameEngine implements ISubject, Runnable {
                     adjustCharacterStats(character, 0, +300);
                     break;
                 case STRATEGY_MAGIC:
-                    character.setAttackStrategy(new patterns.strategy.CircularAttack(8, 4));
+                    character.setAttackStrategy(new patterns.strategy.MagicAttackStrategy(8, 4));
                     adjustCharacterStats(character, +2, +150);
                     break;
             }
