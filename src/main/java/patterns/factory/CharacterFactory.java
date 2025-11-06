@@ -4,8 +4,8 @@ import core.GameState;
 import model.characters.Boss;
 import model.characters.GameCharacter;
 import model.characters.Hero;
+import patterns.strategy.CircularAttack;
 import patterns.strategy.RangedAttack;
-import patterns.strategy.WaveAttack;
 
 import static core.Main.SCREEN_WIDTH;
 
@@ -56,7 +56,7 @@ public class CharacterFactory {
         switch (type) {
             case FIRE_MAGE:
                 boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "skins/boss_skin1.png", "Fire Mage", 25, 2000, 2000);
-                boss.setAttackStrategy(new WaveAttack());
+                boss.setAttackStrategy(new CircularAttack(12, 5));
                 break;
         }
         if (boss != null) {

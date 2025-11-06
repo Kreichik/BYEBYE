@@ -1,14 +1,16 @@
 package model;
 
+import static core.Main.SCREEN_HEIGHT;
 import static core.Main.WORLD_WIDTH;
 
 public class Projectile extends GameObject {
     private final int ownerId;
     private final int damage;
 
-    public Projectile(int id, double x, double y, double velX, String skinPath, int ownerId, int damage) {
+    public Projectile(int id, double x, double y, double velX, double velY, String skinPath, int ownerId, int damage) {
         super(id, x, y, 30, 30, skinPath);
         this.velX = velX;
+        this.velY = velY;
         this.ownerId = ownerId;
         this.damage = damage;
     }
@@ -16,7 +18,7 @@ public class Projectile extends GameObject {
     @Override
     public void tick() {
         super.tick();
-        if (x < -width || x > WORLD_WIDTH) {
+        if (x < -width || x > WORLD_WIDTH || y < -height || y > SCREEN_HEIGHT) {
             active = false;
         }
     }
