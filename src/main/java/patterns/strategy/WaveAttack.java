@@ -13,8 +13,8 @@ public class WaveAttack implements IAttackStrategy {
         double startX = attacker.getX() + attacker.getWidth() / 2.0;
         double startY = attacker.getY() + attacker.getHeight() / 2.0;
 
-        Projectile waveLeft = new Projectile(projectileIdCounter.getAndIncrement(), startX, startY, -7, "skins/wave.png");
-        Projectile waveRight = new Projectile(projectileIdCounter.getAndIncrement(), startX, startY, 7, "skins/wave.png");
+        Projectile waveLeft = new Projectile(projectileIdCounter.getAndIncrement(), startX, startY, -7, "skins/wave.png", attacker.getId(), attacker.getDamage());
+        Projectile waveRight = new Projectile(projectileIdCounter.getAndIncrement(), startX, startY, 7, "skins/wave.png", attacker.getId(), attacker.getDamage());
 
         gameState.addGameObject(waveLeft);
         gameState.addGameObject(waveRight);

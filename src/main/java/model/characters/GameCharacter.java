@@ -9,10 +9,27 @@ public abstract class GameCharacter extends GameObject {
     protected String name;
     protected IAttackStrategy attackStrategy;
 
-    public GameCharacter(int id, double x, double y, int width, int height, String skinPath, String name, int health) {
+    protected int damage;
+    protected double attackRange;
+    protected long attackCooldown;
+    protected long lastAttackTime;
+
+    public GameCharacter(int id, double x, double y, int width, int height, String skinPath, String name, int health, int damage, double attackRange, long attackCooldown) {
         super(id, x, y, width, height, skinPath);
         this.name = name;
         this.health = health;
+        this.damage = damage;
+        this.attackRange = attackRange;
+        this.attackCooldown = attackCooldown;
+        this.lastAttackTime = 0;
+    }
+
+    public void takeDamage(int amount) {
+        this.health -= amount;
+        if (this.health <= 0) {
+            this.active = false;
+            System.out.println(name + " has been defeated!");
+        }
     }
 
     public void performAttack(GameState gameState) {
@@ -25,4 +42,9 @@ public abstract class GameCharacter extends GameObject {
     public void setHealth(int health) { this.health = health; }
     public String getName() { return name; }
     public void setAttackStrategy(IAttackStrategy attackStrategy) { this.attackStrategy = attackStrategy; }
+    public int getDamage() { return damage; }
+    public double getAttackRange() { return attackRange; }
+    public long getAttackCooldown() { return attackCooldown; }
+    public long getLastAttackTime() { return lastAttackTime; }
+    public void setLastAttackTime(long time) { this.lastAttackTime = time; }
 }

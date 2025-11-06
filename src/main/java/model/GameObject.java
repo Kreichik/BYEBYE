@@ -1,6 +1,7 @@
 package model;
 
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import ui.ImageLoader;
@@ -32,6 +33,10 @@ public class GameObject implements Serializable, Cloneable {
         if (image != null) {
             g.drawImage(image, (int) x + screenOffset, (int) y, width, height, null);
         }
+    }
+
+    public Rectangle getBounds() {
+        return new Rectangle((int) x, (int) y, width, height);
     }
 
     public int getId() { return id; }
