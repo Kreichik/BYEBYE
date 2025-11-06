@@ -85,11 +85,17 @@ public class GameEngine implements ISubject, Runnable {
     }
 
     private void updateGameObjects() {
-        List<GameObject> objects = new ArrayList<>(gameState.getGameObjects());
-        for (GameObject obj : objects) {
-            obj.tick();
+        synchronized (gameState) {
+            List<GameObject> objects = new ArrayList<>(gameState.getGameObjects());
+            for (GameObject obj : objects) {
+                obj.tick();
+            }
+            gameState.getGameObjects().removeIf(obj -> !obj.isActive());
         }
-        gameState.getGameObjects().removeIf(obj -> !obj.isActive());
+    }
+
+    public GameState getRawGameState() {
+        return gameState;
     }
 
     private void checkCollisions() {

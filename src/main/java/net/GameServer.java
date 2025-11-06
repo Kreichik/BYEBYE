@@ -1,6 +1,7 @@
 package net;
 
 import core.GameEngine;
+import core.GameState;
 import patterns.factory.CharacterFactory;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,21 +20,26 @@ public class GameServer implements Runnable {
         this.gameEngine = gameEngine;
     }
 
+
     @Override
     public void run() {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
 
-            // Принимаем только 2 клиентов
+            GameState gameState = gameEngine.getRawGameState(); // Получаем ссылку на оригинальный GameState
+
             while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
 
-                if (nextClientId == 1) {
-                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
-                } else if (nextClientId == 2) {
-                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.ARCHER_RIGHT, nextClientId);
+                // Синхронизируем доступ к gameState ПРИ СОЗДАНИИ ГЕРОЕВ
+                synchronized (gameState) {
+                    if (nextClientId == 1) {
+                        CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
+                    } else if (nextClientId == 2) {
+                        CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.ARCHER_RIGHT, nextClientId);
+                    }
                 }
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket, nextClientId, gameEngine);
