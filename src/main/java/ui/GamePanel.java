@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
@@ -67,6 +69,10 @@ public class GamePanel extends JPanel implements IObserver {
             type = PlayerAction.ActionType.MOVE_LEFT;
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             type = PlayerAction.ActionType.MOVE_RIGHT;
+        }else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+            type = PlayerAction.ActionType.MOVE_UP;
+        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
+            type = PlayerAction.ActionType.MOVE_DOWN;
         } else if (keyCode == KeyEvent.VK_SPACE) {
             type = PlayerAction.ActionType.ATTACK;
         }
@@ -81,6 +87,10 @@ public class GamePanel extends JPanel implements IObserver {
             type = PlayerAction.ActionType.STOP_MOVE_LEFT;
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             type = PlayerAction.ActionType.STOP_MOVE_RIGHT;
+        }else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+            type = PlayerAction.ActionType.STOP_MOVE_UP;
+        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
+            type = PlayerAction.ActionType.STOP_MOVE_DOWN;
         }
         if (type != null) {
             networkFacade.sendActionToServer(new PlayerAction(type));
@@ -95,15 +105,31 @@ public class GamePanel extends JPanel implements IObserver {
         }
     }
 
+//    @Override
+//    protected void paintComponent(Graphics g) {
+//        super.paintComponent(g);
+//        if (gameState != null) {
+//            for (GameObject obj : gameState.getGameObjects()) {
+//                obj.render(g, screenOffset);
+//            }
+//        }
+//    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // Рисуем фон
+        Image background = new ImageIcon("src/main/resources/skins/background.png").getImage();
+        g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+
+        // После фона рисуем игровые объекты
         if (gameState != null) {
             for (GameObject obj : gameState.getGameObjects()) {
                 obj.render(g, screenOffset);
             }
         }
     }
+
 
     public GameState getInitialGameState() {
         return gameState;
