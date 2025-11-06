@@ -44,6 +44,10 @@ public class GameEngine implements ISubject, Runnable {
         }
     }
 
+    public GameState getCurrentGameState() {
+        return this.gameState;
+    }
+
     private void tick() {
         processInput();
         updateGameObjects();
@@ -100,6 +104,8 @@ public class GameEngine implements ISubject, Runnable {
     private void checkCollisions() {
         // Implement collision logic here if needed
     }
+
+
 
     public void stop() {
         running = false;

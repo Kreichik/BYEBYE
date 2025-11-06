@@ -78,6 +78,10 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
+            // <<< ГЛАВНОЕ ИЗМЕНЕНИЕ: ОТПРАВЛЯЕМ ПЕРВОЕ СОСТОЯНИЕ
+            // Немедленно отправляем клиенту текущее состояние мира,
+            // в котором его персонаж уже существует.
+            update(gameEngine.getCurrentGameState().deepCopy());
 
             while (running) {
                 PlayerAction action = (PlayerAction) in.readObject();
@@ -89,7 +93,6 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             System.out.println("Client " + clientId + " disconnected.");
         } finally {
             gameEngine.removeObserver(this);
-            // gameState.removeCharacterById(clientId);
             close();
         }
     }
