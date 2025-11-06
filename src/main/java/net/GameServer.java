@@ -2,7 +2,6 @@ package net;
 
 import core.GameEngine;
 import patterns.factory.CharacterFactory;
-import ui.RoleSelectionDialog;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -26,6 +25,7 @@ public class GameServer implements Runnable {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
 
+            // Принимаем только 2 клиентов
             while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
@@ -42,8 +42,26 @@ public class GameServer implements Runnable {
 
                 nextClientId++;
             }
+
+            // ВАЖНО: Не закрываем ServerSocket, ждём пока сервер работает
+            System.out.println("All clients connected. Server is running...");
+
+            // Держим поток живым, пока running == true
+            while (running) {
+                Thread.sleep(1000);
+            }
+
         } catch (Exception e) {
             if (running) {
+                e.printStackTrace();
+            }
+        } finally {
+            // Закрываем только при остановке
+            try {
+                if (serverSocket != null && !serverSocket.isClosed()) {
+                    serverSocket.close();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -99,12 +117,13 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     @Override
     public void update(Object state) {
         try {
-            if (out != null) {
+            if (out != null && running) {
                 out.writeObject(state);
                 out.reset();
             }
         } catch (Exception e) {
             System.out.println("Failed to send state to client " + clientId);
+            e.printStackTrace();
             close();
         }
     }
