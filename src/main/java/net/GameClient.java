@@ -48,7 +48,7 @@ public class GameClient implements Runnable {
             }
         } catch (Exception e) {
             System.err.println("Connection to server lost.");
-            e.printStackTrace(); // Добавим вывод стека для отладки
+            //e.printStackTrace(); // Добавим вывод стека для отладки
         } finally {
             stop();
         }
