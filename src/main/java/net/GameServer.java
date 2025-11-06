@@ -26,12 +26,21 @@ public class GameServer implements Runnable {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
 
-            while (running) {
+            while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Client connected: " + clientSocket.getInetAddress());
-                ClientHandler clientHandler = new ClientHandler(clientSocket, nextClientId++, gameEngine);
+                System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
+
+                if (nextClientId == 1) {
+                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
+                } else if (nextClientId == 2) {
+                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.ARCHER_RIGHT, nextClientId);
+                }
+
+                ClientHandler clientHandler = new ClientHandler(clientSocket, nextClientId, gameEngine);
                 gameEngine.addObserver(clientHandler);
                 new Thread(clientHandler).start();
+
+                nextClientId++;
             }
         } catch (Exception e) {
             if (running) {
@@ -69,10 +78,6 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             this.out = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            CharacterFactory.getFactory().createHero(
-                    clientId == 1 ? CharacterFactory.HeroType.WARRIOR_LEFT : CharacterFactory.HeroType.ARCHER_RIGHT,
-                    clientId
-            );
 
             while (running) {
                 PlayerAction action = (PlayerAction) in.readObject();
@@ -84,7 +89,7 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             System.out.println("Client " + clientId + " disconnected.");
         } finally {
             gameEngine.removeObserver(this);
-            // Here you would also remove the player's character from the game state.
+            // gameState.removeCharacterById(clientId);
             close();
         }
     }
