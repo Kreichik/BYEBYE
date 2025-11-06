@@ -6,6 +6,7 @@ import patterns.strategy.IAttackStrategy;
 
 public abstract class GameCharacter extends GameObject {
     protected int health;
+    protected final int MAX_HEALTH;
     protected String name;
     protected IAttackStrategy attackStrategy;
 
@@ -18,6 +19,7 @@ public abstract class GameCharacter extends GameObject {
         super(id, x, y, width, height, skinPath);
         this.name = name;
         this.health = health;
+        this.MAX_HEALTH = health; // Инициализируем максимальное здоровье
         this.damage = damage;
         this.attackRange = attackRange;
         this.attackCooldown = attackCooldown;
@@ -47,4 +49,5 @@ public abstract class GameCharacter extends GameObject {
     public long getAttackCooldown() { return attackCooldown; }
     public long getLastAttackTime() { return lastAttackTime; }
     public void setLastAttackTime(long time) { this.lastAttackTime = time; }
+    public int getMaxHealth() { return MAX_HEALTH; }
 }

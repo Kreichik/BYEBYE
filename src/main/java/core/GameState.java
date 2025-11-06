@@ -2,7 +2,8 @@ package core;
 
 import model.GameObject;
 import model.characters.GameCharacter;
-import java.io.Serializable;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -32,10 +33,26 @@ public class GameState implements Serializable {
     }
 
     public GameState deepCopy() {
-        GameState newSate = new GameState();
-        for (GameObject obj : this.gameObjects) {
-            newSate.addGameObject(obj.clone());
+        try {
+            // Serialize the current GameState to a byte array
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(this); // Serialize 'this' GameState
+            oos.flush();
+            oos.close(); // Close the output stream to ensure all data is written
+
+            // Deserialize the byte array back into a new GameState object
+            ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            GameState copiedState = (GameState) ois.readObject();
+            ois.close(); // Close the input stream
+
+            return copiedState;
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error during GameState deep copy: " + e.getMessage());
+            e.printStackTrace();
+            return null; // Or throw a custom runtime exception
         }
-        return newSate;
     }
 }

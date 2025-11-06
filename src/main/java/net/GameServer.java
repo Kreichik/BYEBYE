@@ -1,8 +1,8 @@
 package net;
 
 import core.GameEngine;
+import core.GameState;
 import patterns.factory.CharacterFactory;
-import ui.RoleSelectionDialog;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -20,20 +20,25 @@ public class GameServer implements Runnable {
         this.gameEngine = gameEngine;
     }
 
+
     @Override
     public void run() {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
 
+            GameState gameState = gameEngine.getRawGameState(); // Получаем ссылку на оригинальный GameState
+
             while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
 
-                if (nextClientId == 1) {
-                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
-                } else if (nextClientId == 2) {
-                    CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.ARCHER_RIGHT, nextClientId);
+                synchronized (gameState) {
+                    if (nextClientId == 1) {
+                        CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
+                    } else if (nextClientId == 2) {
+                        CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.ARCHER_RIGHT, nextClientId);
+                    }
                 }
 
                 ClientHandler clientHandler = new ClientHandler(clientSocket, nextClientId, gameEngine);
@@ -42,8 +47,24 @@ public class GameServer implements Runnable {
 
                 nextClientId++;
             }
+
+            System.out.println("All clients connected. Server is running...");
+
+            while (running) {
+                Thread.sleep(1000);
+            }
+
         } catch (Exception e) {
             if (running) {
+                e.printStackTrace();
+            }
+        } finally {
+            // Закрываем только при остановке
+            try {
+                if (serverSocket != null && !serverSocket.isClosed()) {
+                    serverSocket.close();
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -76,10 +97,10 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     public void run() {
         try {
             this.out = new ObjectOutputStream(socket.getOutputStream());
-            this.out.flush(); // <<< ДОБАВЬТЕ ЭТУ СТРОКУ
+            this.out.flush();
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            update(gameEngine.getCurrentGameState().deepCopy());
+            update(gameEngine.getCurrentGameState());
 
             while (running) {
                 PlayerAction action = (PlayerAction) in.readObject();
@@ -99,15 +120,35 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     @Override
     public void update(Object state) {
         try {
-            if (out != null) {
-                out.writeObject(state);
-                out.reset();
+            if (out != null && running) {
+                // Assuming 'state' is the GameState object from GameEngine
+                // Synchronize on the state object itself if it's being mutated elsewhere
+                // Or, better, ensure the GameState is a consistent snapshot when passed to update
+                synchronized (state) { // This might be problematic if 'state' is the GameState from GameEngine and it's being written to
+                    out.writeObject(state);
+                    out.flush();
+                    out.reset();
+                }
             }
         } catch (Exception e) {
             System.out.println("Failed to send state to client " + clientId);
+            e.printStackTrace();
             close();
         }
     }
+//    @Override
+//    public void update(Object state) {
+//        try {
+//            if (out != null && running) {
+//                out.writeObject(state);
+//                out.reset();
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Failed to send state to client " + clientId);
+//            e.printStackTrace();
+//            close();
+//        }
+//    }
 
     private void close() {
         running = false;
