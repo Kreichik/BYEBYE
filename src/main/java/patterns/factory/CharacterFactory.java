@@ -5,6 +5,7 @@ import model.characters.Boss;
 import model.characters.GameCharacter;
 import model.characters.Hero;
 import patterns.strategy.CircularAttack;
+import patterns.strategy.MeleeAttackStrategy;
 import patterns.strategy.RangedAttack;
 
 import static core.Main.SCREEN_WIDTH;
@@ -38,7 +39,7 @@ public class CharacterFactory {
         switch (type) {
             case WARRIOR_LEFT:
                 hero = new Hero(id, 300, 150, "skins/knight_stay.png", "Warrior", 15, 800, 1000);
-                hero.setAttackStrategy(new RangedAttack());
+                hero.setAttackStrategy(new MeleeAttackStrategy());
                 break;
             case ARCHER_RIGHT:
                 hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "skins/archer_stay.png", "Archer", 10, 1200, 700);
