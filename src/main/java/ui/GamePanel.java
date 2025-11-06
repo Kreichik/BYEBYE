@@ -7,6 +7,9 @@ import net.NetworkFacade;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
+import java.awt.Window;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -29,6 +32,7 @@ public class GamePanel extends JPanel implements IObserver {
     private final int screenOffset;
     private final Set<Integer> pressedKeys = new HashSet<>();
     private BufferedImage hpRowImage;
+    private volatile boolean gameEnded = false;
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
@@ -62,6 +66,7 @@ public class GamePanel extends JPanel implements IObserver {
                 pressedKeys.add(keyCode);
                 handleKeyPress(keyCode);
             }
+
             private void handlePauseAndOptions() {
                 networkFacade.pauseGame();
                 OptionsDialog dialog = new OptionsDialog();
@@ -97,7 +102,7 @@ public class GamePanel extends JPanel implements IObserver {
             type = PlayerAction.ActionType.MOVE_LEFT;
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             type = PlayerAction.ActionType.MOVE_RIGHT;
-        }else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+        } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
             type = PlayerAction.ActionType.MOVE_UP;
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
             type = PlayerAction.ActionType.MOVE_DOWN;
@@ -115,7 +120,7 @@ public class GamePanel extends JPanel implements IObserver {
             type = PlayerAction.ActionType.STOP_MOVE_LEFT;
         } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
             type = PlayerAction.ActionType.STOP_MOVE_RIGHT;
-        }else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
+        } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
             type = PlayerAction.ActionType.STOP_MOVE_UP;
         } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
             type = PlayerAction.ActionType.STOP_MOVE_DOWN;
@@ -130,10 +135,11 @@ public class GamePanel extends JPanel implements IObserver {
         if (state instanceof GameState) {
             this.gameState = (GameState) state;
             repaint();
+            checkWinConditions();
         }
     }
 
-//    @Override
+    //    @Override
 //    protected void paintComponent(Graphics g) {
 //        super.paintComponent(g);
 //        if (gameState != null) {
@@ -174,5 +180,52 @@ public class GamePanel extends JPanel implements IObserver {
 
     public GameState getInitialGameState() {
         return gameState;
+    }
+
+    private void checkWinConditions() {
+        if (gameEnded || gameState == null) return;
+
+        boolean bossPresent = false;
+        boolean bossAlive = false;
+        boolean clientsPresent = false;
+        boolean anyClientAlive = false;
+
+        for (GameObject obj : gameState.getGameObjects()) {
+            if (obj instanceof GameCharacter) {
+                GameCharacter ch = (GameCharacter) obj;
+                if (ch.getId() == 0) {
+                    bossPresent = true;
+                    bossAlive = obj.isActive();
+                } else {
+                    clientsPresent = true;
+                    if (obj.isActive()) anyClientAlive = true;
+                }
+            }
+        }
+
+        String winner = null;
+        if (bossPresent && !bossAlive) {
+            winner = "Clients";
+        } else if (clientsPresent && !anyClientAlive) {
+            winner = "Boss";
+        }
+
+        if (winner != null) {
+            gameEnded = true;
+            final String message = winner + " win";
+            SwingUtilities.invokeLater(() -> {
+                JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                try {
+                    networkFacade.stop();
+                } catch (Exception ignored) {
+                }
+                Window w = SwingUtilities.getWindowAncestor(this);
+                if (w != null) {
+                    w.dispose();
+                }
+                System.exit(0);
+            });
+        }
+
     }
 }
