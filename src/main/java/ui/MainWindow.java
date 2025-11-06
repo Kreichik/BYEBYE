@@ -23,11 +23,11 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
 
         GameState initialGameState = gamePanel.getInitialGameState();
-        CharacterFactory.init(initialGameState);
-
-        if (role == RoleSelectionDialog.Role.BOSS) {
-            CharacterFactory.getFactory().createBoss(CharacterFactory.BossType.FIRE_MAGE, 0);
-        }
+//        CharacterFactory.init(initialGameState);
+//
+//        if (role == RoleSelectionDialog.Role.BOSS) {
+//            CharacterFactory.getFactory().createBoss(CharacterFactory.BossType.FIRE_MAGE, 0);
+//        }
 
         networkFacade.start(role, serverIp, initialGameState, gamePanel);
 

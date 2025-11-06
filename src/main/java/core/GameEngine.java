@@ -24,7 +24,9 @@ public class GameEngine implements ISubject, Runnable {
     }
 
     public GameState getCurrentGameState() {
-        return this.gameState;
+        synchronized (gameState) {
+            return this.gameState.deepCopy();
+        }
     }
 
     public void addPlayerAction(PlayerAction action) {
@@ -132,7 +134,10 @@ public class GameEngine implements ISubject, Runnable {
 
     @Override
     public void notifyObservers() {
-        GameState stateCopy = gameState.deepCopy();
+        GameState stateCopy;
+        synchronized (gameState) {
+            stateCopy = gameState.deepCopy();
+        }
         for (IObserver o : observers) {
             o.update(stateCopy);
         }

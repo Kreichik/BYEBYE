@@ -76,10 +76,10 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     public void run() {
         try {
             this.out = new ObjectOutputStream(socket.getOutputStream());
-            this.out.flush(); // <<< ДОБАВЬТЕ ЭТУ СТРОКУ
+            this.out.flush();
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            update(gameEngine.getCurrentGameState().deepCopy());
+            update(gameEngine.getCurrentGameState());
 
             while (running) {
                 PlayerAction action = (PlayerAction) in.readObject();

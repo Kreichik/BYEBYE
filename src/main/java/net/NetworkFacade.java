@@ -2,7 +2,7 @@ package net;
 
 import core.GameEngine;
 import core.GameState;
-import patterns.observer.IObserver;
+import patterns.factory.CharacterFactory;
 import ui.GamePanel;
 import ui.RoleSelectionDialog;
 
@@ -15,6 +15,13 @@ public class NetworkFacade {
     public void start(RoleSelectionDialog.Role role, String ip, GameState gameState, GamePanel gamePanel) {
         this.role = role;
         if (role == RoleSelectionDialog.Role.BOSS) {
+
+            // Синхронизируем начальную инициализацию состояния
+            synchronized (gameState) {
+                CharacterFactory.init(gameState);
+                CharacterFactory.getFactory().createBoss(CharacterFactory.BossType.FIRE_MAGE, 0);
+            }
+
             engine = new GameEngine(gameState);
             engine.addObserver(gamePanel);
 
