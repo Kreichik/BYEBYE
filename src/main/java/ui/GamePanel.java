@@ -2,6 +2,7 @@ package ui;
 
 import core.GameState;
 import model.GameObject;
+import model.characters.GameCharacter;
 import net.NetworkFacade;
 import net.PlayerAction;
 import patterns.observer.IObserver;
@@ -13,6 +14,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,6 +28,7 @@ public class GamePanel extends JPanel implements IObserver {
     private final NetworkFacade networkFacade;
     private final int screenOffset;
     private final Set<Integer> pressedKeys = new HashSet<>();
+    private BufferedImage hpRowImage;
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
@@ -43,6 +46,8 @@ public class GamePanel extends JPanel implements IObserver {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
         setFocusable(true);
+
+        hpRowImage = ImageLoader.loadImage("row_points/hp_row.jpg");
 
         addKeyListener(new KeyAdapter() {
             @Override
@@ -118,16 +123,29 @@ public class GamePanel extends JPanel implements IObserver {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Рисуем фон
         Image background = new ImageIcon("src/main/resources/skins/background.png").getImage();
         g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
 
-        // После фона рисуем игровые объекты
         if (gameState != null) {
             for (GameObject obj : gameState.getGameObjects()) {
                 obj.render(g, screenOffset);
+
+                if (obj instanceof GameCharacter) {
+                    GameCharacter character = (GameCharacter) obj;
+                    int healthBarX = (int) character.getX() + screenOffset;
+                    int healthBarY = (int) character.getY() - ShowHP.BAR_HEIGHT - ShowHP.TEXT_OFFSET_Y - 5;
+                    if (hpRowImage != null) {
+                        ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(),
+                                healthBarX, healthBarY, character.getName());
+
+                    } else {
+                        ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(),
+                                healthBarX, healthBarY, character.getName());
+                    }
+                }
             }
         }
+
     }
 
 

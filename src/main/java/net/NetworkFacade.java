@@ -15,8 +15,6 @@ public class NetworkFacade {
     public void start(RoleSelectionDialog.Role role, String ip, GameState gameState, GamePanel gamePanel) {
         this.role = role;
         if (role == RoleSelectionDialog.Role.BOSS) {
-
-            // Синхронизируем начальную инициализацию состояния
             synchronized (gameState) {
                 CharacterFactory.init(gameState);
                 CharacterFactory.getFactory().createBoss(CharacterFactory.BossType.FIRE_MAGE, 0);
@@ -26,9 +24,9 @@ public class NetworkFacade {
             engine.addObserver(gamePanel);
 
             server = new GameServer(9999, engine);
-
             new Thread(server).start();
             new Thread(engine).start();
+
         } else {
             client = new GameClient(ip, 9999, gamePanel);
             new Thread(client).start();

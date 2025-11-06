@@ -33,7 +33,6 @@ public class GameServer implements Runnable {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
 
-                // Синхронизируем доступ к gameState ПРИ СОЗДАНИИ ГЕРОЕВ
                 synchronized (gameState) {
                     if (nextClientId == 1) {
                         CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
@@ -49,10 +48,8 @@ public class GameServer implements Runnable {
                 nextClientId++;
             }
 
-            // ВАЖНО: Не закрываем ServerSocket, ждём пока сервер работает
             System.out.println("All clients connected. Server is running...");
 
-            // Держим поток живым, пока running == true
             while (running) {
                 Thread.sleep(1000);
             }
