@@ -121,8 +121,14 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     public void update(Object state) {
         try {
             if (out != null && running) {
-                out.writeObject(state);
-                out.reset();
+                // Assuming 'state' is the GameState object from GameEngine
+                // Synchronize on the state object itself if it's being mutated elsewhere
+                // Or, better, ensure the GameState is a consistent snapshot when passed to update
+                synchronized (state) { // This might be problematic if 'state' is the GameState from GameEngine and it's being written to
+                    out.writeObject(state);
+                    out.flush();
+                    out.reset();
+                }
             }
         } catch (Exception e) {
             System.out.println("Failed to send state to client " + clientId);
@@ -130,6 +136,19 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             close();
         }
     }
+//    @Override
+//    public void update(Object state) {
+//        try {
+//            if (out != null && running) {
+//                out.writeObject(state);
+//                out.reset();
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Failed to send state to client " + clientId);
+//            e.printStackTrace();
+//            close();
+//        }
+//    }
 
     private void close() {
         running = false;
