@@ -37,6 +37,7 @@ public class GameClient implements Runnable {
         try {
             socket = new Socket(serverIp, port);
             out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush(); // <<< ДОБАВЬТЕ ЭТУ СТРОКУ
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
             while (running) {
@@ -47,11 +48,11 @@ public class GameClient implements Runnable {
             }
         } catch (Exception e) {
             System.err.println("Connection to server lost.");
+            e.printStackTrace(); // Добавим вывод стека для отладки
         } finally {
             stop();
         }
     }
-
     public void stop() {
         running = false;
         try {

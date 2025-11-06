@@ -76,11 +76,9 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     public void run() {
         try {
             this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.out.flush(); // <<< ДОБАВЬТЕ ЭТУ СТРОКУ
             ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 
-            // <<< ГЛАВНОЕ ИЗМЕНЕНИЕ: ОТПРАВЛЯЕМ ПЕРВОЕ СОСТОЯНИЕ
-            // Немедленно отправляем клиенту текущее состояние мира,
-            // в котором его персонаж уже существует.
             update(gameEngine.getCurrentGameState().deepCopy());
 
             while (running) {
@@ -91,6 +89,7 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
 
         } catch (Exception e) {
             System.out.println("Client " + clientId + " disconnected.");
+            e.printStackTrace(); // Добавим вывод стека для отладки
         } finally {
             gameEngine.removeObserver(this);
             close();
