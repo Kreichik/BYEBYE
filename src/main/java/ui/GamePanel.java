@@ -53,10 +53,33 @@ public class GamePanel extends JPanel implements IObserver {
             @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_ESCAPE) {
+                    handlePauseAndOptions();
+                    return;
+                }
                 if (pressedKeys.contains(keyCode)) return;
 
                 pressedKeys.add(keyCode);
                 handleKeyPress(keyCode);
+            }
+            private void handlePauseAndOptions() {
+                networkFacade.pauseGame();
+                OptionsDialog dialog = new OptionsDialog();
+                OptionsDialog.Strategy choice = dialog.showDialog();
+                if (choice != null) {
+                    switch (choice) {
+                        case MELEE:
+                            networkFacade.setStrategyMelee();
+                            break;
+                        case RANGED:
+                            networkFacade.setStrategyRanged();
+                            break;
+                        case MAGIC:
+                            networkFacade.setStrategyMagic();
+                            break;
+                    }
+                }
+                networkFacade.resumeGame();
             }
 
             @Override

@@ -53,4 +53,44 @@ public class NetworkFacade {
             engine.stop();
         }
     }
+    public void pauseGame() {
+        if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
+            engine.addPlayerAction(withClientId(new PlayerAction(PlayerAction.ActionType.PAUSE), 0));
+        } else if (client != null) {
+            client.sendAction(new PlayerAction(PlayerAction.ActionType.PAUSE));
+        }
+    }
+
+    public void resumeGame() {
+        if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
+            engine.addPlayerAction(withClientId(new PlayerAction(PlayerAction.ActionType.RESUME), 0));
+        } else if (client != null) {
+            client.sendAction(new PlayerAction(PlayerAction.ActionType.RESUME));
+        }
+    }
+
+    public void setStrategyMelee() {
+        dispatchStrategy(PlayerAction.ActionType.STRATEGY_MELEE);
+    }
+
+    public void setStrategyRanged() {
+        dispatchStrategy(PlayerAction.ActionType.STRATEGY_RANGED);
+    }
+
+    public void setStrategyMagic() {
+        dispatchStrategy(PlayerAction.ActionType.STRATEGY_MAGIC);
+    }
+
+    private void dispatchStrategy(PlayerAction.ActionType type) {
+        if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
+            engine.addPlayerAction(withClientId(new PlayerAction(type), 0));
+        } else if (client != null) {
+            client.sendAction(new PlayerAction(type));
+        }
+    }
+
+    private PlayerAction withClientId(PlayerAction action, int id) {
+        action.setClientId(id);
+        return action;
+    }
 }

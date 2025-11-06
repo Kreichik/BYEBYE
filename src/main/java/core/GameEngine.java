@@ -18,6 +18,7 @@ public class GameEngine implements ISubject, Runnable {
     private final GameState gameState;
     private final Queue<PlayerAction> actionsQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean running = true;
+    private volatile boolean paused = false;
 
     public GameEngine(GameState gameState) {
         this.gameState = gameState;
@@ -53,8 +54,12 @@ public class GameEngine implements ISubject, Runnable {
 
     private void tick() {
         processInput();
-        updateGameObjects();
-        checkCollisions();
+        if (!paused) {
+            updateGameObjects();
+            checkCollisions();
+        }
+//        updateGameObjects();
+//        checkCollisions();
         notifyObservers();
     }
 
@@ -80,7 +85,43 @@ public class GameEngine implements ISubject, Runnable {
                         character.setLastAttackTime(currentTime);
                     }
                     break;
+                case PAUSE:
+                    paused = true;
+                    break;
+                case RESUME:
+                    paused = false;
+                    break;
+                case STRATEGY_MELEE:
+                    // Increase damage significantly, reset range baseline
+                    character.setAttackStrategy(new patterns.strategy.RangedAttack());
+                    // Melee concept: boost damage, reduce range a bit
+                    // Using setters via direct fields is not available; adjust via helper
+                    adjustCharacterStats(character, +5, -200);
+                    break;
+                case STRATEGY_RANGED:
+                    character.setAttackStrategy(new patterns.strategy.RangedAttack());
+                    adjustCharacterStats(character, 0, +300);
+                    break;
+                case STRATEGY_MAGIC:
+                    character.setAttackStrategy(new patterns.strategy.CircularAttack(8, 4));
+                    adjustCharacterStats(character, +2, +150);
+                    break;
             }
+        }
+    }
+    private void adjustCharacterStats(GameCharacter character, int damageDelta, double rangeDelta) {
+        try {
+            java.lang.reflect.Field damageField = GameCharacter.class.getDeclaredField("damage");
+            damageField.setAccessible(true);
+            int newDamage = Math.max(1, ((int) damageField.get(character)) + damageDelta);
+            damageField.set(character, newDamage);
+
+            java.lang.reflect.Field rangeField = GameCharacter.class.getDeclaredField("attackRange");
+            rangeField.setAccessible(true);
+            double newRange = Math.max(0, ((double) rangeField.get(character)) + rangeDelta);
+            rangeField.set(character, newRange);
+        } catch (Exception ignore) {
+            // If reflection fails, we silently ignore to avoid crashing server loop
         }
     }
 
