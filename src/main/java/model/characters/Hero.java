@@ -16,21 +16,21 @@ public class Hero extends GameCharacter {
         switch (type) {
             case WARRIOR_LEFT:
                 heroAnimation = new Animation("skins/knight_stay.png");
-                heroAnimation.addFrame(ActionType.MOVE_RIGHT, "skins/knight_move_right.png"); // Предполагаемые имена файлов
-                heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/knight_move_left.png");
-                heroAnimation.addFrame(ActionType.ATTACK, "skins/knight_attack.png");
-                heroAnimation.addFrame(ActionType.STOP_MOVE_RIGHT, "skins/knight_stay.png");
-                heroAnimation.addFrame(ActionType.STOP_MOVE_LEFT, "skins/knight_stay.png");
+                heroAnimation.addFrame(ActionType.MOVE_RIGHT, "skins/warrior_right.png");
+                heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/warrior_left.png");
+                heroAnimation.addFrame(ActionType.ATTACK, "skins/warrior_attack.png");
+                heroAnimation.addFrame(ActionType.MOVE_UP, "skins/warrior_back.png");
+                heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/knight_stay.png");
                 break;
 
             case ARCHER_RIGHT:
             default:
                 heroAnimation = new Animation("skins/archer_stay.png");
                 heroAnimation.addFrame(ActionType.MOVE_RIGHT, "skins/archer_moving_right.png");
-                heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/archer_moving_left.png"); // Предполагаемые имена файлов
+                heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/archer_moving_left.png");
                 heroAnimation.addFrame(ActionType.ATTACK, "skins/archer_attack.png");
-                heroAnimation.addFrame(ActionType.STOP_MOVE_RIGHT, "skins/archer_stay.png");
-                heroAnimation.addFrame(ActionType.STOP_MOVE_LEFT, "skins/archer_stay.png");
+                heroAnimation.addFrame(ActionType.MOVE_UP, "skins/archer_moving_back.png");
+                heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/archer_stay.png");
                 break;
         }
 
