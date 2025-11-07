@@ -51,8 +51,6 @@ public class GamePanel extends JPanel implements IObserver {
         setBackground(Color.BLACK);
         setFocusable(true);
 
-        hpRowImage = ImageLoader.loadImage("row_points/hp_row.jpg");
-
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {

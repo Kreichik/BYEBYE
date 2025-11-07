@@ -38,11 +38,11 @@ public class CharacterFactory {
         Hero hero = null;
         switch (type) {
             case WARRIOR_LEFT:
-                hero = new Hero(id, 300, 150, "skins/knight_stay.png", "Warrior", 15, 800, 1000);
+                hero = new Hero(id, 300, 150, "Warrior", 15, 800, 1000, type);
                 hero.setAttackStrategy(new MeleeAttackStrategy());
                 break;
             case ARCHER_RIGHT:
-                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "skins/archer_stay.png", "Archer", 10, 1200, 700);
+                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "Archer", 10, 1200, 700, type);
                 hero.setAttackStrategy(new RangedAttack());
                 break;
         }
@@ -56,7 +56,7 @@ public class CharacterFactory {
         Boss boss = null;
         switch (type) {
             case FIRE_MAGE:
-                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "skins/boss_skin1.png", "Fire Mage", 25, 2000, 2000);
+                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "Fire Mage", 25, 2000, 2000, type);
                 boss.setAttackStrategy(new CircularAttack(12, 5));
                 break;
         }

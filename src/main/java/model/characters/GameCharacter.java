@@ -3,6 +3,7 @@ package model.characters;
 import core.GameState;
 import model.GameObject;
 import patterns.strategy.IAttackStrategy;
+import ui.Animation;
 
 public abstract class GameCharacter extends GameObject {
     protected int health;
@@ -15,8 +16,8 @@ public abstract class GameCharacter extends GameObject {
     protected long attackCooldown;
     protected long lastAttackTime;
 
-    public GameCharacter(int id, double x, double y, int width, int height, String skinPath, String name, int health, int damage, double attackRange, long attackCooldown) {
-        super(id, x, y, width, height, skinPath);
+    public GameCharacter(int id, double x, double y, int width, int height, Animation animation, String name, int health, int damage, double attackRange, long attackCooldown) {
+        super(id, x, y, width, height, animation);
         this.name = name;
         this.health = health;
         this.MAX_HEALTH = health; // Инициализируем максимальное здоровье
