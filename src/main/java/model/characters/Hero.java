@@ -28,7 +28,7 @@ public class Hero extends GameCharacter {
                 heroAnimation = new Animation("skins/archer_stay.png");
                 heroAnimation.addFrame(ActionType.MOVE_RIGHT, "skins/archer_moving_right.png");
                 heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/archer_moving_left.png");
-                heroAnimation.addFrame(ActionType.ATTACK, "skins/archer_attack.png");
+                heroAnimation.addFrame(ActionType.ATTACK, "skins/archer_attacking_left.png");
                 heroAnimation.addFrame(ActionType.MOVE_UP, "skins/archer_moving_back.png");
                 heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/archer_stay.png");
                 break;
