@@ -120,7 +120,7 @@ public class GameEngine implements ISubject, Runnable {
             double newRange = Math.max(0, ((double) rangeField.get(character)) + rangeDelta);
             rangeField.set(character, newRange);
         } catch (Exception ignore) {
-            // If reflection fails, we silently ignore to avoid crashing server loop
+
         }
     }
 

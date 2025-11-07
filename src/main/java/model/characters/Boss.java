@@ -15,15 +15,12 @@ public class Boss extends GameCharacter {
         switch (type) {
             case FIRE_MAGE:
             default:
-                // 1. Создаем анимацию со скином по умолчанию (состояние покоя)
                 bossAnimation = new Animation("skins/boss_skin1.png");
 
-                // 2. Добавляем "кадры" для каждого действия на основе ваших файлов
                 bossAnimation.addFrame(PlayerAction.ActionType.MOVE_RIGHT, "skins/boss_skin2_right.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.MOVE_LEFT, "skins/boss_skin2_left.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.ATTACK, "skins/boss_skin3.png");
 
-                // 3. Когда босс прекращает движение, он должен вернуться в состояние покоя
                 bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_RIGHT, "skins/boss_skin1.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_LEFT, "skins/boss_skin1.png");
 

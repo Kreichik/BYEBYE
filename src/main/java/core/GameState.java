@@ -34,25 +34,23 @@ public class GameState implements Serializable {
 
     public GameState deepCopy() {
         try {
-            // Serialize the current GameState to a byte array
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(this); // Serialize 'this' GameState
+            oos.writeObject(this);
             oos.flush();
-            oos.close(); // Close the output stream to ensure all data is written
+            oos.close();
 
-            // Deserialize the byte array back into a new GameState object
             ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
             ObjectInputStream ois = new ObjectInputStream(bis);
             GameState copiedState = (GameState) ois.readObject();
-            ois.close(); // Close the input stream
+            ois.close();
 
             return copiedState;
 
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error during GameState deep copy: " + e.getMessage());
             e.printStackTrace();
-            return null; // Or throw a custom runtime exception
+            return null;
         }
     }
 }

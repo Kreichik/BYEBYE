@@ -27,7 +27,7 @@ public class GameServer implements Runnable {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
 
-            GameState gameState = gameEngine.getRawGameState(); // Получаем ссылку на оригинальный GameState
+            GameState gameState = gameEngine.getRawGameState();
 
             while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
@@ -59,7 +59,6 @@ public class GameServer implements Runnable {
                 e.printStackTrace();
             }
         } finally {
-            // Закрываем только при остановке
             try {
                 if (serverSocket != null && !serverSocket.isClosed()) {
                     serverSocket.close();
@@ -110,7 +109,7 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
 
         } catch (Exception e) {
             System.out.println("Client " + clientId + " disconnected.");
-            e.printStackTrace(); // Добавим вывод стека для отладки
+            e.printStackTrace(); //здесь была проблема вроде, вроде должно работать хззз
         } finally {
             gameEngine.removeObserver(this);
             close();
@@ -121,10 +120,7 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     public void update(Object state) {
         try {
             if (out != null && running) {
-                // Assuming 'state' is the GameState object from GameEngine
-                // Synchronize on the state object itself if it's being mutated elsewhere
-                // Or, better, ensure the GameState is a consistent snapshot when passed to update
-                synchronized (state) { // This might be problematic if 'state' is the GameState from GameEngine and it's being written to
+                synchronized (state) {
                     out.writeObject(state);
                     out.flush();
                     out.reset();
