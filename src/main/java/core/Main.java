@@ -1,11 +1,12 @@
 package core;
 
+
 import ui.MainWindow;
 import ui.RoleSelectionDialog;
 import javax.swing.JOptionPane;
 
 public class Main {
-    public static final int SCREEN_WIDTH = 800  ;
+    public static final int SCREEN_WIDTH = 800 ;//бека сделай красиво
     public static final int SCREEN_HEIGHT = 600;
     public static final int WORLD_WIDTH = SCREEN_WIDTH * 3;
 

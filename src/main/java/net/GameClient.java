@@ -1,6 +1,9 @@
 package net;
 
 import core.GameState;
+import music.MusicController;
+import music.sound.AudioManager;
+import music.sound.JLayerAudioManager;
 import patterns.observer.IObserver;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
