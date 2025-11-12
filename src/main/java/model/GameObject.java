@@ -4,6 +4,8 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
+
+import ui.Animation;
 import ui.ImageLoader;
 
 public class GameObject implements Serializable, Cloneable {
@@ -11,16 +13,16 @@ public class GameObject implements Serializable, Cloneable {
     protected double x, y;
     protected double velX, velY;
     protected int width, height;
-    protected String skinPath;
+    protected Animation animation;
     protected boolean active = true;
 
-    public GameObject(int id, double x, double y, int width, int height, String skinPath) {
+    public GameObject(int id, double x, double y, int width, int height, Animation animation) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.skinPath = skinPath;
+        this.animation = animation;
     }
 
     public void tick() {
@@ -29,9 +31,16 @@ public class GameObject implements Serializable, Cloneable {
     }
 
     public void render(Graphics g, int screenOffset) {
-        BufferedImage image = ImageLoader.loadImage(skinPath);
+        String currentSkin = animation.getCurrentSkinPath();
+        BufferedImage image = ImageLoader.loadImage(currentSkin);
         if (image != null) {
             g.drawImage(image, (int) x + screenOffset, (int) y, width, height, null);
+        }
+    }
+
+    public void updateAnimationState(net.PlayerAction.ActionType action) {
+        if (animation != null) {
+            animation.changeState(action);
         }
     }
 

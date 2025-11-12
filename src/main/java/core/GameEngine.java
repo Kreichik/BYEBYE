@@ -69,6 +69,8 @@ public class GameEngine implements ISubject, Runnable {
             GameCharacter character = gameState.getCharacterById(action.getClientId());
             if (character == null) continue;
 
+            character.updateAnimationState(action.getType());
+
             switch (action.getType()) {
                 case MOVE_LEFT: character.setVelX(-5); break;
                 case MOVE_RIGHT: character.setVelX(5); break;
@@ -118,7 +120,7 @@ public class GameEngine implements ISubject, Runnable {
             double newRange = Math.max(0, ((double) rangeField.get(character)) + rangeDelta);
             rangeField.set(character, newRange);
         } catch (Exception ignore) {
-            // If reflection fails, we silently ignore to avoid crashing server loop
+
         }
     }
 

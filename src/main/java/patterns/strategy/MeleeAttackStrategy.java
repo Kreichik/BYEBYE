@@ -15,7 +15,7 @@ public class MeleeAttackStrategy implements IAttackStrategy {
     public void execute(GameCharacter attacker, GameState gameState) {
         double startX = attacker.getX() + attacker.getWidth() / 2.0;
         double startY = attacker.getY() + attacker.getHeight() / 2.0;
-        double velX = attacker.getX() < WORLD_WIDTH / 2.0 ? 10 : -10;
+        double velX = attacker.getX() < WORLD_WIDTH / 2.0 ? 10 : -10;// вроде не работает
 
         Projectile projectile = new Projectile(
                 projectileIdCounter.getAndIncrement(),
