@@ -4,6 +4,9 @@ import core.GameState;
 import model.GameObject;
 import model.characters.GameCharacter;
 import net.NetworkFacade;
+import ui.ads.AdManager;
+import ui.ads.AdConfig;
+import ui.video.SimulatedVideoPlayer;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.JPanel;
@@ -31,11 +34,16 @@ public class GamePanel extends JPanel implements IObserver {
     private final int screenOffset;
     private final Set<Integer> pressedKeys = new HashSet<>();
     private volatile boolean gameEnded = false;
+    private volatile boolean inputLocked = false;
+    private final AdManager adManager;
+    private long lastUpdateNano = 0;
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
         this.networkFacade = networkFacade;
         this.gameState = new GameState();
+        this.adManager = new AdManager(networkFacade, new SimulatedVideoPlayer(), new AdConfig(60_000, 10_000, "src/main/resources/videos/ad.mp4"));
+        this.adManager.setInputLockHandlers(() -> inputLocked = true, () -> inputLocked = false);
 
         if (role == RoleSelectionDialog.Role.LEFT_HERO) {
             screenOffset = 0;
@@ -53,6 +61,7 @@ public class GamePanel extends JPanel implements IObserver {
             @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
+                if (inputLocked) return;
                 if (keyCode == KeyEvent.VK_ESCAPE) {
                     handlePauseAndOptions();
                     return;
@@ -87,6 +96,7 @@ public class GamePanel extends JPanel implements IObserver {
             public void keyReleased(KeyEvent e) {
                 int keyCode = e.getKeyCode();
                 pressedKeys.remove(keyCode);
+                if (inputLocked) return;
                 handleKeyRelease(keyCode);
             }
         });
@@ -133,6 +143,11 @@ public class GamePanel extends JPanel implements IObserver {
             this.gameState = (GameState) state;
             repaint();
             checkWinConditions();
+            long now = System.nanoTime();
+            if (lastUpdateNano != 0) {
+                adManager.accumulatePlayTime(now - lastUpdateNano);
+            }
+            lastUpdateNano = now;
         }
     }
 
