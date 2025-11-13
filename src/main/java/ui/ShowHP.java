@@ -7,13 +7,13 @@ import java.awt.image.BufferedImage;
 
 public class ShowHP {
 
-    protected static final int BAR_HEIGHT = 10;
-    protected static final int BAR_WIDTH_MAX = 70;
-    protected static final int TEXT_OFFSET_Y = -15;
-    protected static final Color HEALTH_COLOR = Color.GREEN;
-    protected static final Color BACKGROUND_COLOR = Color.RED;
-    protected static final Color BORDER_COLOR = Color.WHITE;
-    protected static final int BORDER_THICKNESS = 1;
+    public static final int BAR_HEIGHT = 10;
+    public static final int BAR_WIDTH_MAX = 70;
+    public static final int TEXT_OFFSET_Y = -15;
+    public static final Color HEALTH_COLOR = Color.GREEN;
+    public static final Color BACKGROUND_COLOR = Color.RED;
+    public static final Color BORDER_COLOR = Color.WHITE;
+    public static final int BORDER_THICKNESS = 1;
 
     public static void drawHealthBar(Graphics g, int currentHealth, int maxHealth, int x, int y, String name) {
         if (currentHealth < 0) {

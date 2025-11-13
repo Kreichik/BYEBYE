@@ -4,10 +4,11 @@ package model.characters;
 import net.PlayerAction.*;
 import patterns.factory.CharacterFactory;
 import ui.Animation;
+import patterns.visitor.GameObjectVisitor;
 
 public class Hero extends GameCharacter {
     public Hero(int id, double x, double y, String name, int damage, double attackRange, long attackCooldown, CharacterFactory.HeroType type) {
-        super(id, x, y, 70, 80, createHeroAnimation(type), name, 100, damage, attackRange, attackCooldown);
+        super(id, x, y, 70, 80, createHeroAnimation(type), name, 250, damage, attackRange, attackCooldown);
     }
 
     private static Animation createHeroAnimation(CharacterFactory.HeroType type) {
@@ -37,5 +38,8 @@ public class Hero extends GameCharacter {
         return heroAnimation;
     }
 
-
+    @Override
+    public void accept(GameObjectVisitor visitor) {
+        visitor.visitHero(this);
+    }
 }

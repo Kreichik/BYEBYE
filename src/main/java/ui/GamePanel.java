@@ -4,6 +4,9 @@ import core.GameState;
 import model.GameObject;
 import model.characters.GameCharacter;
 import net.NetworkFacade;
+import ui.ads.AdManager;
+import ui.ads.AdConfig;
+import ui.video.JavaFxVideoPlayer;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.JPanel;
@@ -31,11 +34,16 @@ public class GamePanel extends JPanel implements IObserver {
     private final int screenOffset;
     private final Set<Integer> pressedKeys = new HashSet<>();
     private volatile boolean gameEnded = false;
+    private volatile boolean inputLocked = false;
+    private final AdManager adManager;
+    private long lastUpdateNano = 0;
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
         this.networkFacade = networkFacade;
         this.gameState = new GameState();
+        this.adManager = new AdManager(networkFacade, this, new JavaFxVideoPlayer(), new AdConfig(60_000, 10_000, "ad/ad.mp4"));
+        this.adManager.setInputLockHandlers(() -> inputLocked = true, () -> inputLocked = false);
 
         if (role == RoleSelectionDialog.Role.LEFT_HERO) {
             screenOffset = 0;
@@ -53,6 +61,7 @@ public class GamePanel extends JPanel implements IObserver {
             @Override
             public void keyPressed(KeyEvent e) {
                 int keyCode = e.getKeyCode();
+                if (inputLocked) return;
                 if (keyCode == KeyEvent.VK_ESCAPE) {
                     handlePauseAndOptions();
                     return;
@@ -87,6 +96,7 @@ public class GamePanel extends JPanel implements IObserver {
             public void keyReleased(KeyEvent e) {
                 int keyCode = e.getKeyCode();
                 pressedKeys.remove(keyCode);
+                if (inputLocked) return;
                 handleKeyRelease(keyCode);
             }
         });
@@ -133,6 +143,11 @@ public class GamePanel extends JPanel implements IObserver {
             this.gameState = (GameState) state;
             repaint();
             checkWinConditions();
+            long now = System.nanoTime();
+            if (lastUpdateNano != 0) {
+                adManager.accumulatePlayTime(now - lastUpdateNano);
+            }
+            lastUpdateNano = now;
         }
     }
 
@@ -146,14 +161,7 @@ public class GamePanel extends JPanel implements IObserver {
         if (gameState != null) {
             for (GameObject obj : gameState.getGameObjects()) {
                 obj.render(g, screenOffset);
-
-                if (obj instanceof GameCharacter) {
-                    GameCharacter character = (GameCharacter) obj;
-                    int healthBarX = (int) character.getX() + screenOffset;
-                    int healthBarY = (int) character.getY() - ShowHP.BAR_HEIGHT - ShowHP.TEXT_OFFSET_Y - 5;
-
-                    ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(), healthBarX, healthBarY, character.getName());
-                }
+                obj.accept(new patterns.visitor.HealthBarVisitor(g, screenOffset));
             }
         }
 
