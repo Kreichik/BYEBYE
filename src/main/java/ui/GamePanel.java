@@ -4,6 +4,7 @@ import core.GameState;
 import model.GameObject;
 import model.characters.Boss;
 import model.characters.GameCharacter;
+import music.SfxControllerClient; // <<< ДОБАВЬТЕ ЭТОТ ИМПОРТ
 import net.NetworkFacade;
 import ui.ads.AdManager;
 import ui.ads.AdConfig;
@@ -31,6 +32,7 @@ public class GamePanel extends JPanel implements IObserver {
     private volatile boolean inputLocked = false;
     private final AdManager adManager;
     private long lastUpdateNano = 0;
+    private final SfxControllerClient sfxController; // <<< ДОБАВЬТЕ ЭТО ПОЛЕ
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
@@ -38,6 +40,13 @@ public class GamePanel extends JPanel implements IObserver {
         this.gameState = new GameState();
         this.adManager = new AdManager(networkFacade, this, new JavaFxVideoPlayer(), new AdConfig(60_000, 10_000, "ad/ad.mp4"));
         this.adManager.setInputLockHandlers(() -> inputLocked = true, () -> inputLocked = false);
+
+        // <<< ДОБАВЬТЕ ЭТОТ БЛОК
+        if (role != RoleSelectionDialog.Role.BOSS) {
+            this.sfxController = new SfxControllerClient();
+        } else {
+            this.sfxController = null;
+        }
 
         if (role == RoleSelectionDialog.Role.LEFT_HERO) {
             screenOffset = 0;
@@ -50,6 +59,7 @@ public class GamePanel extends JPanel implements IObserver {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
         setFocusable(true);
+
 
         addKeyListener(new KeyAdapter() {
             @Override
@@ -119,7 +129,14 @@ public class GamePanel extends JPanel implements IObserver {
     @Override
     public void update(Object state) {
         if (state instanceof GameState) {
-            this.gameState = (GameState) state;
+            GameState newGameState = (GameState) state;
+
+            // <<< ДОБАВЬТЕ ЭТОТ БЛОК
+            if (sfxController != null) {
+                sfxController.update(newGameState); // Передаем новое состояние в SfxController
+            }
+
+            this.gameState = newGameState;
             repaint();
             checkWinConditions();
             long now = System.nanoTime();

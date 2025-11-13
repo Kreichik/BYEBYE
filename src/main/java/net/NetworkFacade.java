@@ -40,8 +40,6 @@ public class NetworkFacade {
             new Thread(engine).start();
 
         } else {
-            SfxControllerClient sfxController = new SfxControllerClient();
-            engine.addObserver(sfxController);
             client = new GameClient(ip, 9999, gamePanel);
             new Thread(client).start();
         }
