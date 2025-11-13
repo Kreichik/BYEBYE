@@ -1,6 +1,7 @@
 package ui.video;
 
-public interface VideoPlayer {
-    void play(String path, long fallbackDurationMillis, Runnable onComplete, Runnable onError);
-}
+import java.awt.Component;
 
+public interface VideoPlayer {
+    void play(Component parent, String path, long fallbackDurationMillis, Runnable onComplete, Runnable onError);
+}

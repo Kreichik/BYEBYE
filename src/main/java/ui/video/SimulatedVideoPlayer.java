@@ -5,8 +5,7 @@ import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.Component;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,13 +14,14 @@ public class SimulatedVideoPlayer implements VideoPlayer {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     @Override
-    public void play(String path, long fallbackDurationMillis, Runnable onComplete, Runnable onError) {
+    public void play(Component parent, String path, long fallbackDurationMillis, Runnable onComplete, Runnable onError) {
         try {
-            JDialog dialog = new JDialog();
+            JDialog dialog = new JDialog(javax.swing.SwingUtilities.getWindowAncestor(parent));
             dialog.setModal(true);
             dialog.setUndecorated(true);
-            Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-            dialog.setSize(screen);
+            dialog.setSize(parent.getWidth(), parent.getHeight());
+            java.awt.Point p = parent.getLocationOnScreen();
+            dialog.setLocation(p);
             dialog.getContentPane().setBackground(Color.BLACK);
             JProgressBar bar = new JProgressBar(0, 100);
             bar.setForeground(Color.WHITE);

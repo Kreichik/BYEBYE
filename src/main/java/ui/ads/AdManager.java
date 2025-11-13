@@ -2,11 +2,13 @@ package ui.ads;
 
 import net.NetworkFacade;
 import ui.video.VideoPlayer;
+import java.awt.Component;
 
 public class AdManager {
     private final NetworkFacade networkFacade;
     private final VideoPlayer player;
     private final AdConfig config;
+    private final Component parent;
     private long accumulatedPlayNanos = 0;
     private boolean adScheduled = false;
     private boolean adPlaying = false;
@@ -14,8 +16,9 @@ public class AdManager {
     private Runnable onLockInputs;
     private Runnable onUnlockInputs;
 
-    public AdManager(NetworkFacade networkFacade, VideoPlayer player, AdConfig config) {
+    public AdManager(NetworkFacade networkFacade, Component parent, VideoPlayer player, AdConfig config) {
         this.networkFacade = networkFacade;
+        this.parent = parent;
         this.player = player;
         this.config = config;
     }
@@ -39,7 +42,7 @@ public class AdManager {
         metrics.markAdStart();
         try { if (onLockInputs != null) onLockInputs.run(); } catch (Exception ignored) {}
         try { networkFacade.pauseGame(); } catch (Exception ignored) {}
-        player.play(config.getVideoPath(), config.getAdDurationMillis(), this::onAdComplete, this::onAdError);
+        player.play(parent, config.getVideoPath(), config.getAdDurationMillis(), this::onAdComplete, this::onAdError);
     }
 
     private void onAdComplete() {
@@ -62,7 +65,6 @@ public class AdManager {
     public PerformanceMetrics getMetrics() { return metrics; }
 
     public static class TimeUnitMillis {
-        public static long toNanos(long millis) { return millis * 1_000_000L; }
+        public static long toNanos(long millis) { return millis * 500_000L; }
     }
 }
-

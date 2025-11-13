@@ -6,7 +6,7 @@ import model.characters.GameCharacter;
 import net.NetworkFacade;
 import ui.ads.AdManager;
 import ui.ads.AdConfig;
-import ui.video.SimulatedVideoPlayer;
+import ui.video.JavaFxVideoPlayer;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.JPanel;
@@ -42,7 +42,7 @@ public class GamePanel extends JPanel implements IObserver {
         this.role = role;
         this.networkFacade = networkFacade;
         this.gameState = new GameState();
-        this.adManager = new AdManager(networkFacade, new SimulatedVideoPlayer(), new AdConfig(60_000, 10_000, "src/main/resources/videos/ad.mp4"));
+        this.adManager = new AdManager(networkFacade, this, new JavaFxVideoPlayer(), new AdConfig(60_000, 10_000, "ad/ad.mp4"));
         this.adManager.setInputLockHandlers(() -> inputLocked = true, () -> inputLocked = false);
 
         if (role == RoleSelectionDialog.Role.LEFT_HERO) {
