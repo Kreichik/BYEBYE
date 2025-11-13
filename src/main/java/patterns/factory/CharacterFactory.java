@@ -38,11 +38,11 @@ public class CharacterFactory {
         Hero hero = null;
         switch (type) {
             case WARRIOR_LEFT:
-                hero = new Hero(id, 300, 150, "Warrior", 15, 800, 1000, type);
+                hero = new Hero(id, 300, 150, "Warrior", 30, 800, 1000, type);
                 hero.setAttackStrategy(new MeleeAttackStrategy());
                 break;
             case ARCHER_RIGHT:
-                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "Archer", 10, 1200, 700, type);
+                hero = new Hero(id, SCREEN_WIDTH * 2 + 200, 150, "Archer", 20, 1200, 700, type);
                 hero.setAttackStrategy(new RangedAttack());
                 break;
         }

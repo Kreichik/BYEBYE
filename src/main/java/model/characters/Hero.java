@@ -8,7 +8,7 @@ import patterns.visitor.GameObjectVisitor;
 
 public class Hero extends GameCharacter {
     public Hero(int id, double x, double y, String name, int damage, double attackRange, long attackCooldown, CharacterFactory.HeroType type) {
-        super(id, x, y, 70, 80, createHeroAnimation(type), name, 100, damage, attackRange, attackCooldown);
+        super(id, x, y, 70, 80, createHeroAnimation(type), name, 250, damage, attackRange, attackCooldown);
     }
 
     private static Animation createHeroAnimation(CharacterFactory.HeroType type) {
