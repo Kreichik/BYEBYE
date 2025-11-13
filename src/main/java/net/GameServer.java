@@ -94,6 +94,7 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     private final int clientId;
     private final GameEngine gameEngine;
     private ObjectOutputStream out;
+    private ObjectInputStream in;
     private volatile boolean running = true;
 
     public ClientHandler(Socket socket, int clientId, GameEngine gameEngine) {
@@ -105,11 +106,12 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
     @Override
     public void run() {
         try {
-            this.out = new ObjectOutputStream(socket.getOutputStream());
-            this.out.flush();
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            in = new ObjectInputStream(socket.getInputStream());
 
-            update(gameEngine.getCurrentGameState());
+            // Отправляем начальное состояние
+            send(gameEngine.getCurrentGameState());
 
             while (running) {
                 PlayerAction action = (PlayerAction) in.readObject();
@@ -119,22 +121,20 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
 
         } catch (Exception e) {
             System.out.println("Client " + clientId + " disconnected.");
-            e.printStackTrace(); //здесь была проблема вроде, вроде должно работать хззз
+            e.printStackTrace();
         } finally {
             gameEngine.removeObserver(this);
             close();
         }
     }
 
-    @Override
-    public void update(Object state) {
+    // 🔒 Безопасная отправка состояния
+    private synchronized void send(Object state) {
         try {
             if (out != null && running) {
-                synchronized (state) {
-                    out.writeObject(state);
-                    out.flush();
-                    out.reset();
-                }
+                out.reset(); // сброс кэша объектов
+                out.writeObject(state);
+                out.flush();
             }
         } catch (Exception e) {
             System.out.println("Failed to send state to client " + clientId);
@@ -142,19 +142,11 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             close();
         }
     }
-//    @Override
-//    public void update(Object state) {
-//        try {
-//            if (out != null && running) {
-//                out.writeObject(state);
-//                out.reset();
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Failed to send state to client " + clientId);
-//            e.printStackTrace();
-//            close();
-//        }
-//    }
+
+    @Override
+    public void update(Object state) {
+        send(state);
+    }
 
     private void close() {
         running = false;
