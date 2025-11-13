@@ -3,9 +3,6 @@ package ui;
 import core.GameState;
 import model.GameObject;
 import model.characters.GameCharacter;
-import music.MusicController;
-import music.sound.AudioManager;
-import music.sound.JLayerAudioManager;
 import net.NetworkFacade;
 import net.PlayerAction;
 import patterns.observer.IObserver;
@@ -20,7 +17,6 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,24 +25,17 @@ import static core.Main.SCREEN_WIDTH;
 
 public class GamePanel extends JPanel implements IObserver {
 
-
-    private final AudioManager audioManager;
-
     private GameState gameState;
     private final RoleSelectionDialog.Role role;
     private final NetworkFacade networkFacade;
     private final int screenOffset;
     private final Set<Integer> pressedKeys = new HashSet<>();
-    private BufferedImage hpRowImage;
     private volatile boolean gameEnded = false;
-    private final MusicController musicController;
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
         this.networkFacade = networkFacade;
         this.gameState = new GameState();
-        this.audioManager = new JLayerAudioManager();
-        this.musicController = new MusicController(audioManager);
 
         if (role == RoleSelectionDialog.Role.LEFT_HERO) {
             screenOffset = 0;
@@ -137,45 +126,16 @@ public class GamePanel extends JPanel implements IObserver {
         }
     }
 
-    private void startBackgroundMusic() {
-        if (audioManager.isMusicPlaying()) return;
-
-        String musicPath = "src/main/resources/music/army_fight.mp3";
-        if (role == RoleSelectionDialog.Role.LEFT_HERO || role == RoleSelectionDialog.Role.RIGHT_HERO) {
-            musicPath = "src/main/resources/music/terraria_boss_1.mp3";
-        }
-
-        audioManager.playMusic(musicPath, true);
-    }
-
-    private void stopBackgroundMusic() {
-        audioManager.stopMusic();
-    }
-
     private volatile boolean musicStarted = false;
     @Override
     public void update(Object state) {
-        musicController.update(state);
         if (state instanceof GameState) {
             this.gameState = (GameState) state;
-            if (!musicStarted && !gameState.getGameObjects().isEmpty()) {
-                musicStarted = true;
-                startBackgroundMusic();
-            }
             repaint();
             checkWinConditions();
         }
     }
 
-    //    @Override
-//    protected void paintComponent(Graphics g) {
-//        super.paintComponent(g);
-//        if (gameState != null) {
-//            for (GameObject obj : gameState.getGameObjects()) {
-//                obj.render(g, screenOffset);
-//            }
-//        }
-//    }
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -191,14 +151,8 @@ public class GamePanel extends JPanel implements IObserver {
                     GameCharacter character = (GameCharacter) obj;
                     int healthBarX = (int) character.getX() + screenOffset;
                     int healthBarY = (int) character.getY() - ShowHP.BAR_HEIGHT - ShowHP.TEXT_OFFSET_Y - 5;
-                    if (hpRowImage != null) {
-                        ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(),
-                                healthBarX, healthBarY, character.getName());
 
-                    } else {
-                        ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(),
-                                healthBarX, healthBarY, character.getName());
-                    }
+                    ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(), healthBarX, healthBarY, character.getName());
                 }
             }
         }
@@ -240,7 +194,6 @@ public class GamePanel extends JPanel implements IObserver {
 
         if (winner != null) {
             gameEnded = true;
-            stopBackgroundMusic();
 
             final String message = winner + " win";
             SwingUtilities.invokeLater(() -> {

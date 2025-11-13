@@ -22,6 +22,7 @@ public class MusicController implements IObserver {
             return;
         }
 
+
         GameState gameState = (GameState) state;
         GameCharacter boss = findBoss(gameState);
 
@@ -30,6 +31,7 @@ public class MusicController implements IObserver {
 
         // Если трек должен смениться, меняем его
         if (newTrack != null && !newTrack.equals(currentTrack)) {
+            stop();
             switchTrack(newTrack);
             currentTrack = newTrack;
         }
