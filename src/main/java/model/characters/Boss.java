@@ -32,4 +32,9 @@ public class Boss extends GameCharacter {
     public void accept(GameObjectVisitor visitor) {
         visitor.visitBoss(this);
     }
+
+    @Override
+    public double getMoveSpeed() {
+        return 3.0;
+    }
 }

@@ -15,6 +15,7 @@ public abstract class GameCharacter extends GameObject {
     protected double attackRange;
     protected long attackCooldown;
     protected long lastAttackTime;
+    protected double moveSpeed = 5;
 
     public GameCharacter(int id, double x, double y, int width, int height, Animation animation, String name, int health, int damage, double attackRange, long attackCooldown) {
         super(id, x, y, width, height, animation);
@@ -51,5 +52,6 @@ public abstract class GameCharacter extends GameObject {
     public long getLastAttackTime() { return lastAttackTime; }
     public void setLastAttackTime(long time) { this.lastAttackTime = time; }
     public int getMaxHealth() { return MAX_HEALTH; }
+    public double getMoveSpeed() { return moveSpeed; }
 
 }

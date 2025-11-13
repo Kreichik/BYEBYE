@@ -56,7 +56,7 @@ public class CharacterFactory {
         Boss boss = null;
         switch (type) {
             case FIRE_MAGE:
-                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "Fire Mage", 25, 2000, 2000, type);
+                boss = new Boss(id, SCREEN_WIDTH + (SCREEN_WIDTH / 2.0) - 75, 150, "Fire Mage", 25, 2000, 5000, type);
                 boss.setAttackStrategy(new CircularAttack(12, 5));
                 break;
         }
