@@ -2,7 +2,8 @@ package net;
 
 import core.GameEngine;
 import core.GameState;
-import music.SfxController;
+import music.SfxControllerBoss;
+import music.SfxControllerClient;
 import patterns.factory.CharacterFactory;
 import ui.GamePanel;
 import ui.RoleSelectionDialog;
@@ -31,7 +32,7 @@ public class NetworkFacade {
             MusicController musicController = new MusicController(audioManager);
             engine.addObserver(musicController);
 
-            SfxController sfxController = new SfxController();
+            SfxControllerBoss sfxController = new SfxControllerBoss();
             engine.addObserver(sfxController);
 
             server = new GameServer(9999, engine);
@@ -39,6 +40,8 @@ public class NetworkFacade {
             new Thread(engine).start();
 
         } else {
+            SfxControllerClient sfxController = new SfxControllerClient();
+            engine.addObserver(sfxController);
             client = new GameClient(ip, 9999, gamePanel);
             new Thread(client).start();
         }
