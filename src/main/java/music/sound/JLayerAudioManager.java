@@ -8,6 +8,7 @@ public class JLayerAudioManager implements AudioManager {
 
     private volatile boolean isPlaying = false;
     private volatile Thread playbackThread = null;
+    private volatile Player currentPlayer = null;
 
     @Override
     public CompletableFuture<Void> playMusic(String resourcePath, boolean loop) {
@@ -22,9 +23,10 @@ public class JLayerAudioManager implements AudioManager {
                         break;
                     }
                     Player player = new Player(is);
+                    this.currentPlayer = player;
                     player.play();
                 } catch (Exception e) {
-                    e.printStackTrace();
+
                     break;
                 }
                 if (!loop) break;
@@ -42,6 +44,9 @@ public class JLayerAudioManager implements AudioManager {
     @Override
     public void stopMusic() {
         isPlaying = false;
+        if (currentPlayer != null) {
+            currentPlayer.close();
+        }
         if (playbackThread != null) {
             playbackThread.interrupt();
         }
