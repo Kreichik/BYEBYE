@@ -9,21 +9,20 @@ import java.util.*;
 
 public class SfxController implements IObserver {
 
-    // Используем два плеера: один для одноразовых звуков, другой для зацикленных (ходьба)
     private final AsyncMusicPlayer oneShotSfxPlayer = new AsyncMusicPlayer();
     private final AsyncMusicPlayer loopingSfxPlayer = new AsyncMusicPlayer();
 
     // --- Переменные для отслеживания состояния ---
-
-    // Чтобы звук смены фазы проигрался только один раз
     private boolean isPhaseTwoAnnounced = false;
 
-    // Чтобы отслеживать момент атаки
     private long lastKnownAttackTime = 0;
 
-    // Чтобы отслеживать движение босса
     private double lastKnownBossX = -1;
     private boolean isWalkingSoundPlaying = false;
+
+    private final Map<Integer, CharacterWalkState> walkingStates = new HashMap<>();
+
+    private final Set<Integer> deathSoundPlayedFor = new HashSet<>();
 
     @Override
     public void update(Object state) {
@@ -40,31 +39,29 @@ public class SfxController implements IObserver {
         if (boss != null) {
             handlePhaseChangeEvent(boss);
             handleBossAttackEvent(boss);
-            handleWalkingEvent(boss); // Теперь безопасно
-            handleBossDeathEvent(boss);   // Теперь безопасно
+            handleWalkingEvent(boss);
+            handleDeathEvent(boss);
         }
         if (hero1 != null) {
             handleWalkingEvent(hero1);
-            handleHeroDeathEvent(hero1);
+            handleDeathEvent(hero1);
         }
         if (hero2 != null) {
             handleWalkingEvent(hero2);
-            handleHeroDeathEvent(hero2);
+            handleDeathEvent(hero2);
         }
     }
 
-    private void handleBossDeathEvent(GameCharacter boss) {
-        double healthPercent = (double) boss.getHealth() / boss.getMaxHealth();
-        if (healthPercent <= 0 && isPhaseTwoAnnounced) {
-            oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
-            oneShotSfxPlayer.playOnce("src/main/resources/music/victory.mp3");
-        }
-    }
-
-    private void handleHeroDeathEvent(GameCharacter hero) {
-        double healthPercent = (double) hero.getHealth() / hero.getMaxHealth();
-        if (healthPercent <= 0) {
-            oneShotSfxPlayer.playOnce("src/main/resources/dead.mp3");
+    private void handleDeathEvent(GameCharacter character) {
+        int charId = character.getId();
+        if (!character.isActive() && !deathSoundPlayedFor.contains(charId)) {
+            if (charId == 0) {
+                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
+                oneShotSfxPlayer.playOnce("src/main/resources/music/victory.mp3");
+            } else {
+                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
+            }
+            deathSoundPlayedFor.add(charId);
         }
     }
     /**
@@ -93,24 +90,27 @@ public class SfxController implements IObserver {
      * Проверяет, двигается ли босс, и включает/выключает звук ходьбы.
      */
     private void handleWalkingEvent(GameCharacter character) {
+        int charId = character.getId();
         double currentX = character.getX();
-        if (lastKnownBossX == -1) {
-            lastKnownBossX = currentX;
-            return;
-        }
 
-        boolean isCurrentlyMoving = (Math.abs(currentX - lastKnownBossX) > 0.1);
+        CharacterWalkState walkState = walkingStates.computeIfAbsent(charId, id -> new CharacterWalkState(currentX));
 
-        if (isCurrentlyMoving && !isWalkingSoundPlaying) {
-            loopingSfxPlayer.playLoop("src/main/resources/music/walk.mp3");
-            isWalkingSoundPlaying = true;
-        }
-        else if (!isCurrentlyMoving && isWalkingSoundPlaying) {
+        boolean isCurrentlyMoving = (Math.abs(currentX - walkState.lastX) > 0.1);
+
+        if (isCurrentlyMoving && !walkState.isSoundPlaying) {
+            // Важно: пока у нас только один плеер для ходьбы.
+            // Если нужно, чтобы несколько персонажей одновременно издавали звук,
+            // потребуется более сложная система. Пока звук будет только один.
+            if (!loopingSfxPlayer.isPlaying()) {
+                loopingSfxPlayer.playLoop("src/main/resources/music/walk.mp3");
+                walkState.isSoundPlaying = true;
+            }
+        } else if (!isCurrentlyMoving && walkState.isSoundPlaying) {
             loopingSfxPlayer.stop();
-            isWalkingSoundPlaying = false;
+            walkState.isSoundPlaying = false;
         }
 
-        lastKnownBossX = currentX; // Обновляем позицию для следующего кадра
+        walkState.lastX = currentX;
     }
 
     private GameCharacter findBoss(GameState gameState) {
@@ -123,12 +123,15 @@ public class SfxController implements IObserver {
         return gameState.getCharacterById(2);
     }
 
-    /**
-     * Останавливает все звуковые эффекты.
-     */
-    public void stopAllSfx() {
-        oneShotSfxPlayer.stop();
-        loopingSfxPlayer.stop();
-        isWalkingSoundPlaying = false;
+
+
+    private static class CharacterWalkState {
+        double lastX;
+        boolean isSoundPlaying;
+
+        CharacterWalkState(double startX) {
+            this.lastX = startX;
+            this.isSoundPlaying = false;
+        }
     }
 }
