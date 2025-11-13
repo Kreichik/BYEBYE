@@ -1,6 +1,7 @@
 package model;
 
 import ui.Animation;
+import patterns.visitor.GameObjectVisitor;
 
 import static core.Main.SCREEN_HEIGHT;
 import static core.Main.WORLD_WIDTH;
@@ -27,4 +28,9 @@ public class Projectile extends GameObject {
 
     public int getOwnerId() { return ownerId; }
     public int getDamage() { return damage; }
+
+    @Override
+    public void accept(GameObjectVisitor visitor) {
+        visitor.visitProjectile(this);
+    }
 }

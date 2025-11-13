@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
 import ui.Animation;
+import patterns.visitor.GameObjectVisitor;
 import ui.ImageLoader;
 
 public abstract class GameObject implements Serializable, Cloneable {
@@ -73,4 +74,6 @@ public abstract class GameObject implements Serializable, Cloneable {
             throw new AssertionError();
         }
     }
+
+    public abstract void accept(GameObjectVisitor visitor);
 }

@@ -146,14 +146,7 @@ public class GamePanel extends JPanel implements IObserver {
         if (gameState != null) {
             for (GameObject obj : gameState.getGameObjects()) {
                 obj.render(g, screenOffset);
-
-                if (obj instanceof GameCharacter) {
-                    GameCharacter character = (GameCharacter) obj;
-                    int healthBarX = (int) character.getX() + screenOffset;
-                    int healthBarY = (int) character.getY() - ShowHP.BAR_HEIGHT - ShowHP.TEXT_OFFSET_Y - 5;
-
-                    ShowHP.drawHealthBar(g, character.getHealth(), character.getMaxHealth(), healthBarX, healthBarY, character.getName());
-                }
+                obj.accept(new patterns.visitor.HealthBarVisitor(g, screenOffset));
             }
         }
 

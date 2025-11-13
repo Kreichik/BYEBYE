@@ -141,29 +141,11 @@ public class GameEngine implements ISubject, Runnable {
     private void checkCollisions() {
         List<GameObject> objects = gameState.getGameObjects();
         for (GameObject objA : objects) {
-            if (!(objA instanceof Projectile)) {
-                continue;
-            }
-
-            Projectile projectile = (Projectile) objA;
-            if (!projectile.isActive()) continue;
-
+            if (!objA.isActive()) continue;
             for (GameObject objB : objects) {
-                if (!(objB instanceof GameCharacter)) {
-                    continue;
-                }
-
-                GameCharacter character = (GameCharacter) objB;
-                if (!character.isActive() || projectile.getOwnerId() == character.getId()) {
-                    continue;
-                }
-
-                if (projectile.getBounds().intersects(character.getBounds())) {
-                    character.takeDamage(projectile.getDamage());
-                    projectile.setActive(false);
-                    System.out.printf("%s damaged by projectile from %d. Current HP: %d%n", character.getName(), projectile.getOwnerId(), character.getHealth());
-                    break;
-                }
+                if (objA == objB) continue;
+                if (!objB.isActive()) continue;
+                objA.accept(new patterns.visitor.CollisionVisitor(objB, gameState));
             }
         }
     }

@@ -4,6 +4,7 @@ package model.characters;
 import net.PlayerAction.*;
 import patterns.factory.CharacterFactory;
 import ui.Animation;
+import patterns.visitor.GameObjectVisitor;
 
 public class Hero extends GameCharacter {
     public Hero(int id, double x, double y, String name, int damage, double attackRange, long attackCooldown, CharacterFactory.HeroType type) {
@@ -37,5 +38,8 @@ public class Hero extends GameCharacter {
         return heroAnimation;
     }
 
-
+    @Override
+    public void accept(GameObjectVisitor visitor) {
+        visitor.visitHero(this);
+    }
 }

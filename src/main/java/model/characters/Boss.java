@@ -3,6 +3,7 @@ package model.characters;
 import net.PlayerAction;
 import patterns.factory.CharacterFactory;
 import ui.Animation;
+import patterns.visitor.GameObjectVisitor;
 
 public class Boss extends GameCharacter {
     public Boss(int id, double x, double y, String name, int damage, double attackRange, long attackCooldown, CharacterFactory.BossType type) {
@@ -25,5 +26,10 @@ public class Boss extends GameCharacter {
         }
 
         return bossAnimation;
+    }
+
+    @Override
+    public void accept(GameObjectVisitor visitor) {
+        visitor.visitBoss(this);
     }
 }
