@@ -5,6 +5,8 @@ import model.GameObject;
 import model.characters.GameCharacter;
 import patterns.observer.IObserver;
 
+import java.util.*;
+
 public class SfxController implements IObserver {
 
     // Используем два плеера: один для одноразовых звуков, другой для зацикленных (ходьба)
@@ -34,16 +36,24 @@ public class SfxController implements IObserver {
         GameCharacter hero1 = findHero1(gameState);
         GameCharacter hero2 = findHero2(gameState);
 
-        handlePhaseChangeEvent(boss);
-        handleBossAttackEvent(boss);
-        handleWalkingEvent(boss);
-        handleWalkingEvent(hero1);
-        handleWalkingEvent(hero2);
-        handleBossDeadEvent(boss);
-        handleHeroDeadEvent(hero1);
+
+        if (boss != null) {
+            handlePhaseChangeEvent(boss);
+            handleBossAttackEvent(boss);
+            handleWalkingEvent(boss); // Теперь безопасно
+            handleBossDeathEvent(boss);   // Теперь безопасно
+        }
+        if (hero1 != null) {
+            handleWalkingEvent(hero1);
+            handleHeroDeathEvent(hero1);
+        }
+        if (hero2 != null) {
+            handleWalkingEvent(hero2);
+            handleHeroDeathEvent(hero2);
+        }
     }
 
-    private void handleBossDeadEvent(GameCharacter boss) {
+    private void handleBossDeathEvent(GameCharacter boss) {
         double healthPercent = (double) boss.getHealth() / boss.getMaxHealth();
         if (healthPercent <= 0 && isPhaseTwoAnnounced) {
             oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
@@ -51,7 +61,7 @@ public class SfxController implements IObserver {
         }
     }
 
-    private void handleHeroDeadEvent(GameCharacter hero) {
+    private void handleHeroDeathEvent(GameCharacter hero) {
         double healthPercent = (double) hero.getHealth() / hero.getMaxHealth();
         if (healthPercent <= 0) {
             oneShotSfxPlayer.playOnce("src/main/resources/dead.mp3");
