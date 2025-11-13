@@ -2,6 +2,9 @@ package net;
 
 import core.GameEngine;
 import core.GameState;
+import music.MusicController;
+import music.sound.AudioManager;
+import music.sound.JLayerAudioManager;
 import patterns.factory.CharacterFactory;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -26,6 +29,13 @@ public class GameServer implements Runnable {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Server started on port: " + port);
+
+            System.out.println("Initializing server-side audio...");
+            AudioManager audioManager = new JLayerAudioManager();
+            MusicController musicController = new MusicController(audioManager);
+
+            gameEngine.addObserver(musicController);
+            System.out.println("MusicController is now observing the game state.");
 
             GameState gameState = gameEngine.getRawGameState();
 

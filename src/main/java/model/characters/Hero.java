@@ -18,7 +18,7 @@ public class Hero extends GameCharacter {
                 heroAnimation = new Animation("skins/knight_stay.png");
                 heroAnimation.addFrame(ActionType.MOVE_RIGHT, "skins/warrior_right.png");
                 heroAnimation.addFrame(ActionType.MOVE_LEFT, "skins/warrior_left.png");
-                heroAnimation.addFrame(ActionType.ATTACK, "skins/warrior_attack.png");
+                heroAnimation.addFrame(ActionType.ATTACK, "skins/warrior_attacking_right.png");
                 heroAnimation.addFrame(ActionType.MOVE_UP, "skins/warrior_back.png");
                 heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/knight_stay.png");
                 break;
@@ -36,4 +36,6 @@ public class Hero extends GameCharacter {
 
         return heroAnimation;
     }
+
+
 }

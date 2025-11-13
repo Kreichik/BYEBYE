@@ -2,9 +2,13 @@ package net;
 
 import core.GameEngine;
 import core.GameState;
+import music.SfxController;
 import patterns.factory.CharacterFactory;
 import ui.GamePanel;
 import ui.RoleSelectionDialog;
+import music.MusicController;
+import music.sound.AudioManager;
+import music.sound.JLayerAudioManager;
 
 public class NetworkFacade {
     private GameServer server;
@@ -22,6 +26,13 @@ public class NetworkFacade {
 
             engine = new GameEngine(gameState);
             engine.addObserver(gamePanel);
+
+            AudioManager audioManager = new JLayerAudioManager();
+            MusicController musicController = new MusicController(audioManager);
+            engine.addObserver(musicController);
+
+            SfxController sfxController = new SfxController();
+            engine.addObserver(sfxController);
 
             server = new GameServer(9999, engine);
             new Thread(server).start();

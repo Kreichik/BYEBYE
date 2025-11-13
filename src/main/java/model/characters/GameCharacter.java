@@ -51,4 +51,5 @@ public abstract class GameCharacter extends GameObject {
     public long getLastAttackTime() { return lastAttackTime; }
     public void setLastAttackTime(long time) { this.lastAttackTime = time; }
     public int getMaxHealth() { return MAX_HEALTH; }
+
 }

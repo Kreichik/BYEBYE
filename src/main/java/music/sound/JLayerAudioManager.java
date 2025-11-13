@@ -18,7 +18,7 @@ public class JLayerAudioManager implements AudioManager {
             while (isPlaying) {
                 try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
                     if (is == null) {
-                        System.err.println("Аудиофайл не найден: " + resourcePath);
+                        System.err.println("Fie not found: " + resourcePath);
                         break;
                     }
                     Player player = new Player(is);

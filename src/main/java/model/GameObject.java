@@ -8,7 +8,7 @@ import java.io.Serializable;
 import ui.Animation;
 import ui.ImageLoader;
 
-public class GameObject implements Serializable, Cloneable {
+public abstract class GameObject implements Serializable, Cloneable {
     protected int id;
     protected double x, y;
     protected double velX, velY;
@@ -47,7 +47,9 @@ public class GameObject implements Serializable, Cloneable {
     public Rectangle getBounds() {
         return new Rectangle((int) x, (int) y, width, height);
     }
-
+    public Animation getAnimation() {
+        return animation;
+    }
     public int getId() { return id; }
     public double getX() { return x; }
     public double getY() { return y; }

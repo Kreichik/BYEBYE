@@ -10,7 +10,6 @@ public class MusicController implements IObserver {
     private final AudioManager audioManager;
     private String currentTrack = null;
     private boolean gameEnded = false;
-    AsyncMusicPlayer music = new AsyncMusicPlayer();
 
     public MusicController(AudioManager audioManager) {
         this.audioManager = audioManager;
@@ -18,26 +17,36 @@ public class MusicController implements IObserver {
 
     @Override
     public void update(Object state) {
-        if (gameEnded || !(state instanceof GameState)) return;
+        // Не делаем ничего, если игра закончилась или состояние некорректно
+        if (gameEnded || !(state instanceof GameState)) {
+            return;
+        }
 
         GameState gameState = (GameState) state;
         GameCharacter boss = findBoss(gameState);
 
-        String newTrack = determineTrack(boss, gameState);
+        // Определяем, какой трек должен играть сейчас
+        String newTrack = determineBackgroundTrack(boss, gameState);
+
+        // Если трек должен смениться, меняем его
         if (newTrack != null && !newTrack.equals(currentTrack)) {
             switchTrack(newTrack);
             currentTrack = newTrack;
         }
     }
 
+    /**
+     * Находит объект босса в состоянии игры.
+     */
     private GameCharacter findBoss(GameState gameState) {
+        // Предполагаем, что ID босса всегда 0
         return gameState.getCharacterById(0);
     }
 
-    private String determineTrack(GameCharacter boss, GameState gameState) {
+    private String determineBackgroundTrack(GameCharacter boss, GameState gameState) {
         if (boss == null || !boss.isActive()) {
             gameEnded = true;
-            return "victory";
+            return "first_bg";
         }
 
         boolean anyHeroAlive = false;
@@ -50,15 +59,15 @@ public class MusicController implements IObserver {
 
         if (!anyHeroAlive) {
             gameEnded = true;
-            return "boss_victory";
+            return "first_bg";
         }
 
         double healthPercent = (double) boss.getHealth() / boss.getMaxHealth();
-        if (healthPercent <= 0.5) {
-            music.playOnce("src/main/resources/music/boss_2_phase_opening.mp3");
-            return "terraria_boss_1.mp3";
-        } else {
-            return "terraria_boss_1.mp3";
+
+        if (healthPercent <= 0.99) {
+            return "terraria_boss_1";
+        }else{
+            return "first_bg";
         }
     }
 
