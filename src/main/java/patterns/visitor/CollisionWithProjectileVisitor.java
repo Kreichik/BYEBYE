@@ -4,6 +4,7 @@ import core.GameState;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
+import model.characters.NPC;
 
 public class CollisionWithProjectileVisitor implements GameObjectVisitor {
     private final Projectile projectile;
@@ -16,25 +17,34 @@ public class CollisionWithProjectileVisitor implements GameObjectVisitor {
 
     @Override
     public void visitHero(Hero hero) {
-        if (!projectile.isActive()) return;
-        if (!hero.isActive()) return;
-        if (projectile.getOwnerId() == hero.getId()) return;
+        if (!projectile.isActive() || !hero.isActive()) return;
+        if (projectile.getFactionId() == hero.getFactionId()) return;
+
         if (projectile.getBounds().intersects(hero.getBounds())) {
             hero.takeDamage(projectile.getDamage());
             projectile.setActive(false);
-            System.out.printf("%s damaged by projectile from %d. Current HP: %d%n", hero.getName(), projectile.getOwnerId(), hero.getHealth());
         }
     }
 
     @Override
     public void visitBoss(Boss boss) {
-        if (!projectile.isActive()) return;
-        if (!boss.isActive()) return;
-        if (projectile.getOwnerId() == boss.getId()) return;
+        if (!projectile.isActive() || !boss.isActive()) return;
+        if (projectile.getFactionId() == boss.getFactionId()) return;
+
         if (projectile.getBounds().intersects(boss.getBounds())) {
             boss.takeDamage(projectile.getDamage());
             projectile.setActive(false);
-            System.out.printf("%s damaged by projectile from %d. Current HP: %d%n", boss.getName(), projectile.getOwnerId(), boss.getHealth());
+        }
+    }
+
+    @Override
+    public void visitNpc(NPC npc) {
+        if (!projectile.isActive() || !npc.isActive()) return;
+        if (projectile.getFactionId() == npc.getFactionId()) return;
+
+        if (projectile.getBounds().intersects(npc.getBounds())) {
+            npc.takeDamage(projectile.getDamage());
+            projectile.setActive(false);
         }
     }
 
@@ -42,4 +52,3 @@ public class CollisionWithProjectileVisitor implements GameObjectVisitor {
     public void visitProjectile(Projectile otherProjectile) {
     }
 }
-

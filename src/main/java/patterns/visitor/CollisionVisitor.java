@@ -4,6 +4,7 @@ import core.GameState;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
+import model.characters.NPC;
 import model.GameObject;
 
 public class CollisionVisitor implements GameObjectVisitor {
@@ -24,8 +25,11 @@ public class CollisionVisitor implements GameObjectVisitor {
     }
 
     @Override
+    public void visitNpc(NPC npc) {
+    }
+
+    @Override
     public void visitProjectile(Projectile projectile) {
         other.accept(new CollisionWithProjectileVisitor(projectile, gameState));
     }
 }
-

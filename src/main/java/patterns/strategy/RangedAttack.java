@@ -19,6 +19,7 @@ public class RangedAttack implements IAttackStrategy {
                 projectileIdCounter.getAndIncrement(),
                 startX, startY, velX, 0, "skins/archer_attack.png",
                 attacker.getId(),
+                attacker.getFactionId(),
                 attacker.getDamage()
         );
         gameState.addGameObject(projectile);

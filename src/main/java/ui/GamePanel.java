@@ -2,6 +2,7 @@ package ui;
 
 import core.GameState;
 import model.GameObject;
+import model.characters.Boss;
 import model.characters.GameCharacter;
 import net.NetworkFacade;
 import ui.ads.AdManager;
@@ -9,15 +10,8 @@ import ui.ads.AdConfig;
 import ui.video.JavaFxVideoPlayer;
 import net.PlayerAction;
 import patterns.observer.IObserver;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
-import java.awt.Window;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
-import javax.swing.ImageIcon;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
@@ -78,15 +72,9 @@ public class GamePanel extends JPanel implements IObserver {
                 OptionsDialog.Strategy choice = dialog.showDialog();
                 if (choice != null) {
                     switch (choice) {
-                        case MELEE:
-                            networkFacade.setStrategyMelee();
-                            break;
-                        case RANGED:
-                            networkFacade.setStrategyRanged();
-                            break;
-                        case MAGIC:
-                            networkFacade.setStrategyMagic();
-                            break;
+                        case MELEE: networkFacade.setStrategyMelee(); break;
+                        case RANGED: networkFacade.setStrategyRanged(); break;
+                        case MAGIC: networkFacade.setStrategyMagic(); break;
                     }
                 }
                 networkFacade.resumeGame();
@@ -104,17 +92,13 @@ public class GamePanel extends JPanel implements IObserver {
 
     private void handleKeyPress(int keyCode) {
         PlayerAction.ActionType type = null;
-        if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_LEFT) {
-            type = PlayerAction.ActionType.MOVE_LEFT;
-        } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
-            type = PlayerAction.ActionType.MOVE_RIGHT;
-        } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
-            type = PlayerAction.ActionType.MOVE_UP;
-        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
-            type = PlayerAction.ActionType.MOVE_DOWN;
-        } else if (keyCode == KeyEvent.VK_SPACE) {
-            type = PlayerAction.ActionType.ATTACK;
-        }
+        if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_LEFT) type = PlayerAction.ActionType.MOVE_LEFT;
+        else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) type = PlayerAction.ActionType.MOVE_RIGHT;
+        else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) type = PlayerAction.ActionType.MOVE_UP;
+        else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) type = PlayerAction.ActionType.MOVE_DOWN;
+        else if (keyCode == KeyEvent.VK_SPACE) type = PlayerAction.ActionType.ATTACK;
+        else if (keyCode == KeyEvent.VK_Q && role == RoleSelectionDialog.Role.BOSS) type = PlayerAction.ActionType.SPAWN_NPC;
+
         if (type != null) {
             networkFacade.sendActionToServer(new PlayerAction(type));
         }
@@ -122,21 +106,16 @@ public class GamePanel extends JPanel implements IObserver {
 
     private void handleKeyRelease(int keyCode) {
         PlayerAction.ActionType type = null;
-        if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_LEFT) {
-            type = PlayerAction.ActionType.STOP_MOVE_LEFT;
-        } else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) {
-            type = PlayerAction.ActionType.STOP_MOVE_RIGHT;
-        } else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) {
-            type = PlayerAction.ActionType.STOP_MOVE_UP;
-        } else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) {
-            type = PlayerAction.ActionType.STOP_MOVE_DOWN;
-        }
+        if (keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_LEFT) type = PlayerAction.ActionType.STOP_MOVE_LEFT;
+        else if (keyCode == KeyEvent.VK_D || keyCode == KeyEvent.VK_RIGHT) type = PlayerAction.ActionType.STOP_MOVE_RIGHT;
+        else if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) type = PlayerAction.ActionType.STOP_MOVE_UP;
+        else if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) type = PlayerAction.ActionType.STOP_MOVE_DOWN;
+
         if (type != null) {
             networkFacade.sendActionToServer(new PlayerAction(type));
         }
     }
 
-    private volatile boolean musicStarted = false;
     @Override
     public void update(Object state) {
         if (state instanceof GameState) {
@@ -165,8 +144,41 @@ public class GamePanel extends JPanel implements IObserver {
             }
         }
 
+        if (role == RoleSelectionDialog.Role.BOSS) {
+            drawNpcCooldownUI(g);
+        }
     }
 
+    private void drawNpcCooldownUI(Graphics g) {
+        if (gameState == null) return;
+        Boss boss = null;
+        for (GameObject obj : gameState.getGameObjects()) {
+            if (obj instanceof Boss) {
+                boss = (Boss) obj;
+                break;
+            }
+        }
+
+        if (boss == null) return;
+
+        long[] cooldowns = boss.getNpcCooldowns();
+        long currentTime = System.currentTimeMillis();
+        int circleSize = 30;
+
+        for (int i = 0; i < cooldowns.length; i++) {
+            int x = 20 + (i * (circleSize + 10));
+            int y = 20;
+
+            if (currentTime >= cooldowns[i]) {
+                g.setColor(Color.GREEN);
+            } else {
+                g.setColor(Color.GRAY);
+            }
+            g.fillOval(x, y, circleSize, circleSize);
+            g.setColor(Color.WHITE);
+            g.drawOval(x, y, circleSize, circleSize);
+        }
+    }
 
     public GameState getInitialGameState() {
         return gameState;
@@ -175,17 +187,14 @@ public class GamePanel extends JPanel implements IObserver {
     private void checkWinConditions() {
         if (gameEnded || gameState == null) return;
 
-        boolean bossPresent = false;
-        boolean bossAlive = false;
-        boolean clientsPresent = false;
-        boolean anyClientAlive = false;
+        boolean bossPresent = false, bossAlive = false, clientsPresent = false, anyClientAlive = false;
 
         for (GameObject obj : gameState.getGameObjects()) {
             if (obj instanceof GameCharacter) {
                 GameCharacter ch = (GameCharacter) obj;
-                if (ch.getId() == 0) {
+                if (ch.getFactionId() == 0) {
                     bossPresent = true;
-                    bossAlive = obj.isActive();
+                    if (obj.isActive()) bossAlive = true;
                 } else {
                     clientsPresent = true;
                     if (obj.isActive()) anyClientAlive = true;
@@ -194,26 +203,19 @@ public class GamePanel extends JPanel implements IObserver {
         }
 
         String winner = null;
-        if (bossPresent && !bossAlive) {
-            winner = "Clients";
-        } else if (clientsPresent && !anyClientAlive) {
-            winner = "Boss";
-        }
+        if (bossPresent && !bossAlive) winner = "Clients";
+        else if (clientsPresent && !anyClientAlive) winner = "Boss";
 
         if (winner != null) {
             gameEnded = true;
-
             final String message = winner + " win";
             SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(this, message, "Game Over", JOptionPane.INFORMATION_MESSAGE);
                 try {
                     networkFacade.stop();
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
                 Window w = SwingUtilities.getWindowAncestor(this);
-                if (w != null) {
-                    w.dispose();
-                }
+                if (w != null) w.dispose();
                 System.exit(0);
             });
         }

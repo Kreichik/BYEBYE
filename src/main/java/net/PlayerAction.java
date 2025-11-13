@@ -4,7 +4,10 @@ import java.io.Serializable;
 
 public class PlayerAction implements Serializable {
     public enum ActionType {
-        MOVE_LEFT, MOVE_RIGHT ,MOVE_UP ,MOVE_DOWN ,STOP_MOVE_LEFT,STOP_MOVE_RIGHT ,STOP_MOVE_UP ,STOP_MOVE_DOWN , ATTACK,
+        MOVE_LEFT, MOVE_RIGHT, MOVE_UP, MOVE_DOWN,
+        STOP_MOVE_LEFT, STOP_MOVE_RIGHT, STOP_MOVE_UP, STOP_MOVE_DOWN,
+        ATTACK,
+        SPAWN_NPC,
         PAUSE, RESUME,
         STRATEGY_MELEE, STRATEGY_RANGED, STRATEGY_MAGIC
     }

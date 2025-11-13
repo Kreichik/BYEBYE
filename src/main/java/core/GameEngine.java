@@ -1,12 +1,14 @@
 package core;
 
 import model.GameObject;
-import model.Projectile;
+import model.characters.Boss;
 import model.characters.GameCharacter;
+import model.characters.NPC;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import patterns.observer.ISubject;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -19,6 +21,7 @@ public class GameEngine implements ISubject, Runnable {
     private final Queue<PlayerAction> actionsQueue = new ConcurrentLinkedQueue<>();
     private volatile boolean running = true;
     private volatile boolean paused = false;
+    private final List<Integer> deadNpcQueue = new ArrayList<>();
 
     public GameEngine(GameState gameState) {
         this.gameState = gameState;
@@ -28,6 +31,10 @@ public class GameEngine implements ISubject, Runnable {
         synchronized (gameState) {
             return this.gameState.deepCopy();
         }
+    }
+
+    public Object getGameStateLock() {
+        return this.gameState;
     }
 
     public void addPlayerAction(PlayerAction action) {
@@ -57,9 +64,8 @@ public class GameEngine implements ISubject, Runnable {
         if (!paused) {
             updateGameObjects();
             checkCollisions();
+            handleAutonomousActions();
         }
-//        updateGameObjects();
-//        checkCollisions();
         notifyObservers();
     }
 
@@ -87,12 +93,13 @@ public class GameEngine implements ISubject, Runnable {
                         character.setLastAttackTime(currentTime);
                     }
                     break;
-                case PAUSE:
-                    paused = true;
+                case SPAWN_NPC:
+                    if (character instanceof Boss) {
+                        ((Boss) character).trySpawnNpc(gameState);
+                    }
                     break;
-                case RESUME:
-                    paused = false;
-                    break;
+                case PAUSE: paused = true; break;
+                case RESUME: paused = false; break;
                 case STRATEGY_MELEE:
                     character.setAttackStrategy(new patterns.strategy.MeleeAttackStrategy());
                     adjustCharacterStats(character, +5, -200);
@@ -108,34 +115,55 @@ public class GameEngine implements ISubject, Runnable {
             }
         }
     }
+
     private void adjustCharacterStats(GameCharacter character, int damageDelta, double rangeDelta) {
         try {
             java.lang.reflect.Field damageField = GameCharacter.class.getDeclaredField("damage");
             damageField.setAccessible(true);
-            int newDamage = Math.max(1, ((int) damageField.get(character)) + damageDelta);
-            damageField.set(character, newDamage);
+            damageField.set(character, Math.max(1, ((int) damageField.get(character)) + damageDelta));
 
             java.lang.reflect.Field rangeField = GameCharacter.class.getDeclaredField("attackRange");
             rangeField.setAccessible(true);
-            double newRange = Math.max(0, ((double) rangeField.get(character)) + rangeDelta);
-            rangeField.set(character, newRange);
-        } catch (Exception ignore) {
-
-        }
+            rangeField.set(character, Math.max(0, ((double) rangeField.get(character)) + rangeDelta));
+        } catch (Exception ignore) {}
     }
 
     private void updateGameObjects() {
         synchronized (gameState) {
-            List<GameObject> objects = new ArrayList<>(gameState.getGameObjects());
-            for (GameObject obj : objects) {
+            for (GameObject obj : gameState.getGameObjects()) {
                 obj.tick();
+                if (obj instanceof NPC && !obj.isActive()) {
+                    deadNpcQueue.add(obj.getId());
+                }
             }
             gameState.getGameObjects().removeIf(obj -> !obj.isActive());
         }
     }
 
-    public GameState getRawGameState() {
-        return gameState;
+    private void handleAutonomousActions() {
+        Boss boss = null;
+        synchronized (gameState) {
+            for (GameObject obj : gameState.getGameObjects()) {
+                if (obj instanceof Boss) {
+                    boss = (Boss) obj;
+                }
+                if (obj instanceof NPC) {
+                    NPC npc = (NPC) obj;
+                    long currentTime = System.currentTimeMillis();
+                    if (currentTime - npc.getLastAttackTime() > npc.getAttackCooldown()) {
+                        npc.performAttack(gameState);
+                        npc.setLastAttackTime(currentTime);
+                    }
+                }
+            }
+        }
+
+        if (boss != null && !deadNpcQueue.isEmpty()) {
+            for (Integer npcId : deadNpcQueue) {
+                boss.onNpcDied(npcId);
+            }
+            deadNpcQueue.clear();
+        }
     }
 
     private void checkCollisions() {
@@ -143,16 +171,13 @@ public class GameEngine implements ISubject, Runnable {
         for (GameObject objA : objects) {
             if (!objA.isActive()) continue;
             for (GameObject objB : objects) {
-                if (objA == objB) continue;
-                if (!objB.isActive()) continue;
+                if (objA == objB || !objB.isActive()) continue;
                 objA.accept(new patterns.visitor.CollisionVisitor(objB, gameState));
             }
         }
     }
 
-    public void stop() {
-        running = false;
-    }
+    public void stop() { running = false; }
 
     @Override
     public void addObserver(IObserver o) { observers.add(o); }

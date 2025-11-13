@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
+import model.characters.NPC;
 import ui.ShowHP;
 
 public class HealthBarVisitor implements GameObjectVisitor {
@@ -30,7 +31,13 @@ public class HealthBarVisitor implements GameObjectVisitor {
     }
 
     @Override
+    public void visitNpc(NPC npc) {
+        int healthBarX = (int) npc.getX() + screenOffset;
+        int healthBarY = (int) npc.getY() - ShowHP.BAR_HEIGHT - ShowHP.TEXT_OFFSET_Y - 5;
+        ShowHP.drawHealthBar(g, npc.getHealth(), npc.getMaxHealth(), healthBarX, healthBarY, npc.getName());
+    }
+
+    @Override
     public void visitProjectile(Projectile projectile) {
     }
 }
-
