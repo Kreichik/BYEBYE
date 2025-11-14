@@ -40,8 +40,7 @@ public class NetworkFacade {
             new Thread(engine).start();
 
         } else {
-            SfxControllerClient sfxController = new SfxControllerClient();
-            engine.addObserver(sfxController);
+
             client = new GameClient(ip, 9999, gamePanel);
             new Thread(client).start();
         }
@@ -67,6 +66,7 @@ public class NetworkFacade {
             engine.stop();
         }
     }
+
     public void pauseGame() {
         if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
             engine.addPlayerAction(withClientId(new PlayerAction(PlayerAction.ActionType.PAUSE), 0));
