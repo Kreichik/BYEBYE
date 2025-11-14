@@ -10,6 +10,7 @@ import java.util.*;
 public class SfxControllerClient extends SfxController implements IObserver {
 
     private long lastKnownAttackTime = 0;
+    private final Map<Integer, Integer> heroHealthMap = new HashMap<>();
 
     @Override
     public void update(Object state) {
@@ -26,25 +27,24 @@ public class SfxControllerClient extends SfxController implements IObserver {
             handleWalkingEvent(hero1);
             handleDeathEvent(hero1);
             handleWalkingEvent(hero1);
+            handleHeroTakeDamageEvent(hero1);
         }
         if (hero2 != null) {
             handleHeroAttackEvent(hero2);
             handleWalkingEvent(hero2);
             handleDeathEvent(hero2);
+            handleHeroTakeDamageEvent(hero2);
         }
     }
 
-    private void handleDeathEvent(GameCharacter character) {
-        int charId = character.getId();
-        if (!character.isActive() && !deathSoundPlayedFor.contains(charId)) {
-            if (charId == 0) {
-                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
-                oneShotSfxPlayer.playOnce("src/main/resources/music/victory.mp3");
-            } else {
-                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
-            }
-            deathSoundPlayedFor.add(charId);
+    private void handleHeroTakeDamageEvent(GameCharacter hero) {
+        int heroId = hero.getId();
+        int currentHealth = hero.getHealth();
+        int lastKnownHealth = heroHealthMap.getOrDefault(heroId, hero.getMaxHealth());
+        if (hero.isActive() && currentHealth < lastKnownHealth ) {
+            oneShotSfxPlayer.playOnce("src/main/resources/music/hero_take_damage.mp3");
         }
+        heroHealthMap.put(heroId, currentHealth);
     }
 
     private void handleHeroAttackEvent(GameCharacter hero) {

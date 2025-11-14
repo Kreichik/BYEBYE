@@ -37,8 +37,18 @@ public abstract class SfxController {
         walkState.lastX = currentX;
     }
 
-
-
+    protected void handleDeathEvent(GameCharacter character) {
+        int charId = character.getId();
+        if (!character.isActive() && !deathSoundPlayedFor.contains(charId)) {
+            if (charId == 0) {
+                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
+                oneShotSfxPlayer.playOnce("src/main/resources/music/victory.mp3");
+            } else {
+                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
+            }
+            deathSoundPlayedFor.add(charId);
+        }
+    }
 
     private static class CharacterWalkState {
         double lastX;

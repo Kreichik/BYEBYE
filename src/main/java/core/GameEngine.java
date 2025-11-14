@@ -58,8 +58,6 @@ public class GameEngine implements ISubject, Runnable {
             updateGameObjects();
             checkCollisions();
         }
-//        updateGameObjects();
-//        checkCollisions();
         notifyObservers();
     }
 

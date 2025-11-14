@@ -19,9 +19,13 @@ public class Boss extends GameCharacter {
                 bossAnimation = new Animation("skins/boss_skin1.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.MOVE_RIGHT, "skins/boss_skin2_right.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.MOVE_LEFT, "skins/boss_skin2_left.png");
+                bossAnimation.addFrame(PlayerAction.ActionType.MOVE_DOWN, "skins/boss_skin2_left.png");
+                bossAnimation.addFrame(PlayerAction.ActionType.MOVE_UP, "skins/boss_skin2_right.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.ATTACK, "skins/boss_skin3.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_RIGHT, "skins/boss_skin1.png");
                 bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_LEFT, "skins/boss_skin1.png");
+                bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_DOWN, "skins/boss_skin1.png");
+                bossAnimation.addFrame(PlayerAction.ActionType.STOP_MOVE_UP, "skins/boss_skin1.png");
                 break;
         }
 
