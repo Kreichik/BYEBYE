@@ -4,5 +4,5 @@ import core.GameState;
 import java.io.Serializable;
 
 public interface InteractionEffect extends Serializable {
-    void applyEffect(GameState gameState);
+    void applyEffect(GameState gameState, double x, double y);
 }

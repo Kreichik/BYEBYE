@@ -10,9 +10,13 @@ public class Hero extends GameCharacter {
         super(id, x, y, 70, 80, createHeroAnimation(type), name, 250, damage, attackRange, attackCooldown, id);
     }
 
-    public void revive() {
+    public void revive(double spawnX, double spawnY) {
         this.setActive(true);
         this.setHealth(this.getMaxHealth() / 2);
+        this.setVelX(0);
+        this.setVelY(0);
+        this.setX(spawnX + this.getWidth());
+        this.setY(spawnY);
     }
 
     private static Animation createHeroAnimation(CharacterFactory.HeroType type) {

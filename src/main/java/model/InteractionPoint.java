@@ -28,7 +28,7 @@ public class InteractionPoint extends GameObject {
             this.progress = (double) elapsedTime / requiredInteractionTime;
 
             if (elapsedTime >= requiredInteractionTime) {
-                effect.applyEffect(gameState);
+                effect.applyEffect(gameState, this.x, this.y);
                 this.setActive(false);
             }
         } else {

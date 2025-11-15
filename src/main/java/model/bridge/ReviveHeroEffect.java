@@ -12,10 +12,10 @@ public class ReviveHeroEffect implements InteractionEffect {
     }
 
     @Override
-    public void applyEffect(GameState gameState) {
+    public void applyEffect(GameState gameState, double x, double y) {
         GameCharacter character = gameState.getCharacterById(heroToReviveId);
         if (character instanceof Hero) {
-            ((Hero) character).revive();
+            ((Hero) character).revive(x, y);
         }
     }
 }
