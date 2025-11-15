@@ -31,11 +31,11 @@ public abstract class GameObject implements Serializable, Cloneable {
         y += velY;
     }
 
-    public void render(Graphics g, int screenOffset) {
+    public void render(Graphics g, int offsetX, int offsetY) {
         String currentSkin = animation.getCurrentSkinPath();
         BufferedImage image = ImageLoader.loadImage(currentSkin);
         if (image != null) {
-            g.drawImage(image, (int) x + screenOffset, (int) y, width, height, null);
+            g.drawImage(image, (int) x + offsetX, (int) y + offsetY, width, height, null);
         }
     }
 

@@ -10,6 +10,7 @@ import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.*;
 import java.awt.*;
+import ui.ImageLoader;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
@@ -23,7 +24,8 @@ public class GamePanel extends JPanel implements IObserver {
     private GameState gameState;
     private final RoleSelectionDialog.Role role;
     private final NetworkFacade networkFacade;
-    private final int screenOffset;
+    private int cameraOffsetX = 0;
+    private int cameraOffsetY = 0;
     private final Set<Integer> pressedKeys = new HashSet<>();
     private volatile boolean gameEnded = false;
     private volatile boolean inputLocked = false;
@@ -41,13 +43,7 @@ public class GamePanel extends JPanel implements IObserver {
             this.sfxController = null;
         }
 
-        if (role == RoleSelectionDialog.Role.LEFT_HERO) {
-            screenOffset = 0;
-        } else if (role == RoleSelectionDialog.Role.BOSS) {
-            screenOffset = -SCREEN_WIDTH;
-        } else {
-            screenOffset = -SCREEN_WIDTH * 2;
-        }
+        // camera offsets are computed dynamically in update/paint
 
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         setBackground(Color.BLACK);
@@ -140,13 +136,24 @@ public class GamePanel extends JPanel implements IObserver {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Image background = new ImageIcon("src/main/resources/skins/background.png").getImage();
-        g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+        java.awt.image.BufferedImage background = ImageLoader.loadImage("skins/background.png");
+        if (background != null) {
+            int bgW = background.getWidth();
+            int bgH = background.getHeight();
+            int startX = -Math.floorMod(cameraOffsetX, bgW);
+            int startY = -Math.floorMod(cameraOffsetY, bgH);
+            for (int x = startX; x < getWidth(); x += bgW) {
+                for (int y = startY; y < getHeight(); y += bgH) {
+                    g.drawImage(background, x, y, bgW, bgH, this);
+                }
+            }
+        }
 
         if (gameState != null) {
+            updateCameraOffsets();
             for (GameObject obj : gameState.getGameObjects()) {
-                obj.render(g, screenOffset);
-                obj.accept(new patterns.visitor.HealthBarVisitor(g, screenOffset));
+                obj.render(g, cameraOffsetX, cameraOffsetY);
+                obj.accept(new patterns.visitor.HealthBarVisitor(g, cameraOffsetX, cameraOffsetY));
             }
         }
 
@@ -224,6 +231,17 @@ public class GamePanel extends JPanel implements IObserver {
                 if (w != null) w.dispose();
                 System.exit(0);
             });
+        }
+    }
+
+    private void updateCameraOffsets() {
+        int myId = role == RoleSelectionDialog.Role.BOSS ? 0 : (role == RoleSelectionDialog.Role.LEFT_HERO ? 1 : 2);
+        GameCharacter me = gameState.getCharacterById(myId);
+        if (me != null) {
+            int centerX = getWidth() / 2;
+            int centerY = getHeight() / 2;
+            cameraOffsetX = centerX - (int) me.getX();
+            cameraOffsetY = centerY - (int) me.getY();
         }
     }
 }
