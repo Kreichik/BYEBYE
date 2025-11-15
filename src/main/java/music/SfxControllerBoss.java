@@ -30,19 +30,6 @@ public class SfxControllerBoss extends SfxController implements IObserver {
 
     }
 
-    private void handleDeathEvent(GameCharacter character) {
-        int charId = character.getId();
-        if (!character.isActive() && !deathSoundPlayedFor.contains(charId)) {
-            if (charId == 0) {
-                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
-                oneShotSfxPlayer.playOnce("src/main/resources/music/victory.mp3");
-            } else {
-                oneShotSfxPlayer.playOnce("src/main/resources/music/dead.mp3");
-            }
-            deathSoundPlayedFor.add(charId);
-        }
-    }
-
     private void handlePhaseChangeEvent(GameCharacter boss) {
         double healthPercent = (double) boss.getHealth() / boss.getMaxHealth();
         if (healthPercent <= 0.5 && !isPhaseTwoAnnounced) {

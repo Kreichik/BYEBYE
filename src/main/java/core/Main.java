@@ -5,8 +5,8 @@ import ui.RoleSelectionDialog;
 import javax.swing.JOptionPane;
 
 public class Main {
-    public static final int SCREEN_WIDTH = 800 ;//бека сделай красиво
-    public static final int SCREEN_HEIGHT = 600;
+    public static final int SCREEN_WIDTH = 1920 ;//бека сделай красиво
+    public static final int SCREEN_HEIGHT = 1080;
     public static final int WORLD_WIDTH = SCREEN_WIDTH * 3;
 
     public static void main(String[] args) {

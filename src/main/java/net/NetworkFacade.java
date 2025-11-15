@@ -67,6 +67,7 @@ public class NetworkFacade {
             engine.stop();
         }
     }
+
     public void pauseGame() {
         if (role == RoleSelectionDialog.Role.BOSS && engine != null) {
             engine.addPlayerAction(withClientId(new PlayerAction(PlayerAction.ActionType.PAUSE), 0));
