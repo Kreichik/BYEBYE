@@ -14,7 +14,7 @@ public class InteractionPoint extends GameObject {
     private double progress = 0.0;
 
     public InteractionPoint(int id, double x, double y, long requiredTime, InteractionEffect effect) {
-        super(id, x, y, 100, 100, new Animation("skins/revive_point.png"));
+        super(id, x, y, 120, 120, new Animation("skins/revive_point.png"));
         this.requiredInteractionTime = requiredTime;
         this.effect = effect;
     }
