@@ -10,9 +10,13 @@ public class Hero extends GameCharacter {
         super(id, x, y, 70, 80, createHeroAnimation(type), name, 250, damage, attackRange, attackCooldown, id);
     }
 
+    public void revive() {
+        this.setActive(true);
+        this.setHealth(this.getMaxHealth() / 2);
+    }
+
     private static Animation createHeroAnimation(CharacterFactory.HeroType type) {
         Animation heroAnimation;
-
         switch (type) {
             case WARRIOR_LEFT:
                 heroAnimation = new Animation("skins/knight_stay.png");
@@ -22,7 +26,6 @@ public class Hero extends GameCharacter {
                 heroAnimation.addFrame(ActionType.MOVE_UP, "skins/warrior_back.png");
                 heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/knight_stay.png");
                 break;
-
             case ARCHER_RIGHT:
             default:
                 heroAnimation = new Animation("skins/archer_stay.png");
@@ -33,7 +36,6 @@ public class Hero extends GameCharacter {
                 heroAnimation.addFrame(ActionType.MOVE_DOWN, "skins/archer_stay.png");
                 break;
         }
-
         return heroAnimation;
     }
 

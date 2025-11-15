@@ -1,6 +1,7 @@
 package patterns.visitor;
 
 import core.GameState;
+import model.InteractionPoint;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
@@ -31,5 +32,9 @@ public class CollisionVisitor implements GameObjectVisitor {
     @Override
     public void visitProjectile(Projectile projectile) {
         other.accept(new CollisionWithProjectileVisitor(projectile, gameState));
+    }
+
+    @Override
+    public void visitInteractionPoint(InteractionPoint point) {
     }
 }

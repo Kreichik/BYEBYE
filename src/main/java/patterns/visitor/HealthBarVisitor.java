@@ -1,6 +1,7 @@
 package patterns.visitor;
 
 import java.awt.Graphics;
+import model.InteractionPoint;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
@@ -39,5 +40,9 @@ public class HealthBarVisitor implements GameObjectVisitor {
 
     @Override
     public void visitProjectile(Projectile projectile) {
+    }
+
+    @Override
+    public void visitInteractionPoint(InteractionPoint point) {
     }
 }
