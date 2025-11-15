@@ -6,9 +6,6 @@ import model.characters.Boss;
 import model.characters.GameCharacter;
 import music.SfxControllerClient; // <<< ДОБАВЬТЕ ЭТОТ ИМПОРТ
 import net.NetworkFacade;
-import ui.ads.AdManager;
-import ui.ads.AdConfig;
-import ui.video.JavaFxVideoPlayer;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import javax.swing.*;
@@ -30,16 +27,12 @@ public class GamePanel extends JPanel implements IObserver {
     private final Set<Integer> pressedKeys = new HashSet<>();
     private volatile boolean gameEnded = false;
     private volatile boolean inputLocked = false;
-    private final AdManager adManager;
-    private long lastUpdateNano = 0;
     private final SfxControllerClient sfxController; // <<< ДОБАВЬТЕ ЭТО ПОЛЕ
 
     public GamePanel(RoleSelectionDialog.Role role, NetworkFacade networkFacade) {
         this.role = role;
         this.networkFacade = networkFacade;
         this.gameState = new GameState();
-        this.adManager = new AdManager(networkFacade, this, new JavaFxVideoPlayer(), new AdConfig(60_000, 10_000, "ad/ad.mp4"));
-        this.adManager.setInputLockHandlers(() -> inputLocked = true, () -> inputLocked = false);
 
         // <<< ДОБАВЬТЕ ЭТОТ БЛОК
         if (role != RoleSelectionDialog.Role.BOSS) {
@@ -139,11 +132,7 @@ public class GamePanel extends JPanel implements IObserver {
             this.gameState = newGameState;
             repaint();
             checkWinConditions();
-            long now = System.nanoTime();
-            if (lastUpdateNano != 0) {
-                adManager.accumulatePlayTime(now - lastUpdateNano);
-            }
-            lastUpdateNano = now;
+
         }
     }
 
