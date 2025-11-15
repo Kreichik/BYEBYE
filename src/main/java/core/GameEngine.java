@@ -63,9 +63,9 @@ public class GameEngine implements ISubject, Runnable {
     private void tick() {
         processInput();
         if (!paused) {
-            handleAutonomousActions(); // <<< ПЕРЕМЕСТИЛ СЮДА
-            checkCollisions();         // <<< ПЕРЕМЕСТИЛ СЮДА
-            updateGameObjects();       // <<< ПЕРЕМЕСТИЛ СЮДА
+            handleAutonomousActions();
+            checkCollisions();
+            updateGameObjects();
         }
         notifyObservers();
     }
@@ -74,7 +74,7 @@ public class GameEngine implements ISubject, Runnable {
         while (!actionsQueue.isEmpty()) {
             PlayerAction action = actionsQueue.poll();
             GameCharacter character = gameState.getCharacterById(action.getClientId());
-            if (character == null) continue;
+            if (character == null || !character.isActive()) continue;
 
             character.updateAnimationState(action.getType());
 
@@ -137,8 +137,7 @@ public class GameEngine implements ISubject, Runnable {
                     deadNpcQueue.add(obj.getId());
                 }
             }
-            // Теперь удаляем объекты после всех логических шагов
-            gameState.getGameObjects().removeIf(obj -> !obj.isActive());
+            gameState.getGameObjects().removeIf(obj -> !obj.isActive() && !(obj instanceof Hero));
         }
     }
 
@@ -152,8 +151,6 @@ public class GameEngine implements ISubject, Runnable {
                 if (obj instanceof Boss) boss = (Boss) obj;
                 if (obj instanceof InteractionPoint && obj.isActive()) interactionPoints.add((InteractionPoint) obj);
                 if (obj instanceof Hero && obj.isActive()) livingHeroes.add((Hero) obj);
-                // Если герой мертв, но еще не удален, он не попадет в livingHeroes
-                // но его InteractionPoint может быть обработан, если другой герой рядом
 
                 if (obj instanceof NPC) {
                     NPC npc = (NPC) obj;
@@ -166,7 +163,6 @@ public class GameEngine implements ISubject, Runnable {
             }
         }
 
-        // Обрабатываем точки возрождения
         for (InteractionPoint point : interactionPoints) {
             boolean heroIsNear = false;
             for (Hero hero : livingHeroes) {
