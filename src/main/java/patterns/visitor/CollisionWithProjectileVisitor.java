@@ -28,6 +28,7 @@ public class CollisionWithProjectileVisitor implements GameObjectVisitor {
             projectile.setActive(false);
 
             if (wasAlive && !hero.isActive()) {
+                System.out.printf("[DEBUG] Hero %s died at coordinates X: %.2f, Y: %.2f%n", hero.getName(), hero.getX(), hero.getY());
                 CharacterFactory.getFactory().createRevivePoint(hero);
             }
         }

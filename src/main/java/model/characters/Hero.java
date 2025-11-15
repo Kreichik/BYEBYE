@@ -17,6 +17,7 @@ public class Hero extends GameCharacter {
         this.setVelY(0);
         this.setX(spawnX + this.getWidth());
         this.setY(spawnY);
+        System.out.printf("[DEBUG] Hero %s revived at coordinates X: %.2f, Y: %.2f%n", this.getName(), this.getX(), this.getY());
     }
 
     private static Animation createHeroAnimation(CharacterFactory.HeroType type) {

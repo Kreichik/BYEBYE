@@ -41,7 +41,7 @@ public class InteractionPoint extends GameObject {
     public void render(Graphics g, int screenOffset) {
         super.render(g, screenOffset);
         if (progress > 0 && progress < 1.0) {
-            g.setColor(Color.CYAN);
+            g.setColor(Color.YELLOW);
             int barWidth = (int) (this.width * progress);
             g.fillRect((int) this.x + screenOffset, (int) this.y + this.height, barWidth, 5);
         }
