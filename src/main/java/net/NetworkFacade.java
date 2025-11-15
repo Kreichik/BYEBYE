@@ -40,7 +40,8 @@ public class NetworkFacade {
             new Thread(engine).start();
 
         } else {
-
+            // SfxControllerClient sfxController = new SfxControllerClient(); // Эту логику нужно будет реализовать иначе
+            // engine.addObserver(sfxController); // <<< ЭТА СТРОКА ВЫЗЫВАЛА ОШИБКУ И БЫЛА УДАЛЕНА
             client = new GameClient(ip, 9999, gamePanel);
             new Thread(client).start();
         }

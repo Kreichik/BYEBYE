@@ -1,7 +1,6 @@
 package net;
 
 import core.GameEngine;
-import core.GameState;
 import music.MusicController;
 import music.sound.AudioManager;
 import music.sound.JLayerAudioManager;
@@ -37,13 +36,13 @@ public class GameServer implements Runnable {
             gameEngine.addObserver(musicController);
             System.out.println("MusicController is now observing the game state.");
 
-            GameState gameState = gameEngine.getRawGameState();
+            Object gameStateLock = gameEngine.getGameStateLock();
 
             while (running && nextClientId <= 2) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Client connected: " + clientSocket.getInetAddress() + " with ID: " + nextClientId);
 
-                synchronized (gameState) {
+                synchronized (gameStateLock) {
                     if (nextClientId == 1) {
                         CharacterFactory.getFactory().createHero(CharacterFactory.HeroType.WARRIOR_LEFT, nextClientId);
                     } else if (nextClientId == 2) {
@@ -110,7 +109,6 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
 
-            // Отправляем начальное состояние
             send(gameEngine.getCurrentGameState());
 
             while (running) {
@@ -128,11 +126,10 @@ class ClientHandler implements Runnable, patterns.observer.IObserver {
         }
     }
 
-    // 🔒 Безопасная отправка состояния
     private synchronized void send(Object state) {
         try {
             if (out != null && running) {
-                out.reset(); // сброс кэша объектов
+                out.reset();
                 out.writeObject(state);
                 out.flush();
             }

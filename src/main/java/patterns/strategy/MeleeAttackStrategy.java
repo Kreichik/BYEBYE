@@ -21,6 +21,7 @@ public class MeleeAttackStrategy implements IAttackStrategy {
                 projectileIdCounter.getAndIncrement(),
                 startX, startY, velX, 0, "skins/warrior_attack_left.png",
                 attacker.getId(),
+                attacker.getFactionId(),
                 attacker.getDamage()
         );
         gameState.addGameObject(projectile);

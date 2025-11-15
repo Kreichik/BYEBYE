@@ -29,6 +29,7 @@ public class CircularAttack implements IAttackStrategy {
                     projectileIdCounter.getAndIncrement(),
                     startX, startY, velX, velY, "skins/wave.png",
                     attacker.getId(),
+                    attacker.getFactionId(),
                     attacker.getDamage()
             );
             gameState.addGameObject(projectile);

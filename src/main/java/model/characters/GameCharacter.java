@@ -10,6 +10,7 @@ public abstract class GameCharacter extends GameObject {
     protected final int MAX_HEALTH;
     protected String name;
     protected IAttackStrategy attackStrategy;
+    protected final int factionId;
 
     protected int damage;
     protected double attackRange;
@@ -17,15 +18,16 @@ public abstract class GameCharacter extends GameObject {
     protected long lastAttackTime;
     protected double moveSpeed = 5;
 
-    public GameCharacter(int id, double x, double y, int width, int height, Animation animation, String name, int health, int damage, double attackRange, long attackCooldown) {
+    public GameCharacter(int id, double x, double y, int width, int height, Animation animation, String name, int health, int damage, double attackRange, long attackCooldown, int factionId) {
         super(id, x, y, width, height, animation);
         this.name = name;
         this.health = health;
-        this.MAX_HEALTH = health; // Инициализируем максимальное здоровье
+        this.MAX_HEALTH = health;
         this.damage = damage;
         this.attackRange = attackRange;
         this.attackCooldown = attackCooldown;
         this.lastAttackTime = 0;
+        this.factionId = factionId;
     }
 
     public void takeDamage(int amount) {
@@ -53,5 +55,5 @@ public abstract class GameCharacter extends GameObject {
     public void setLastAttackTime(long time) { this.lastAttackTime = time; }
     public int getMaxHealth() { return MAX_HEALTH; }
     public double getMoveSpeed() { return moveSpeed; }
-
+    public int getFactionId() { return factionId; }
 }
