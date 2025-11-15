@@ -124,9 +124,8 @@ public class GamePanel extends JPanel implements IObserver {
         if (state instanceof GameState) {
             GameState newGameState = (GameState) state;
 
-            // <<< ДОБАВЬТЕ ЭТОТ БЛОК
             if (sfxController != null) {
-                sfxController.update(newGameState); // Передаем новое состояние в SfxController
+                sfxController.update(newGameState);
             }
 
             this.gameState = newGameState;

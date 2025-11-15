@@ -8,7 +8,7 @@ public class NPC extends GameCharacter {
     public static final int FACTION_ID = 0;
 
     public NPC(int id, double x, double y) {
-        super(id, x, y, 70, 70, createNpcAnimation(), "Minion", 150, 10, 1000, 2000, FACTION_ID);
+        super(id, x, y, 140, 140, createNpcAnimation(), "Rune Spire", 150, 10, 1000, 2000, FACTION_ID);
         this.setAttackStrategy(new patterns.strategy.CircularAttack(8, 4));
     }
 

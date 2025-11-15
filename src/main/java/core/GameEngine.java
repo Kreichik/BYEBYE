@@ -1,14 +1,15 @@
 package core;
 
 import model.GameObject;
+import model.InteractionPoint;
 import model.characters.Boss;
 import model.characters.GameCharacter;
+import model.characters.Hero;
 import model.characters.NPC;
 import net.PlayerAction;
 import patterns.observer.IObserver;
 import patterns.observer.ISubject;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -62,9 +63,9 @@ public class GameEngine implements ISubject, Runnable {
     private void tick() {
         processInput();
         if (!paused) {
-            updateGameObjects();
-            checkCollisions();
             handleAutonomousActions();
+            checkCollisions();
+            updateGameObjects();
         }
         notifyObservers();
     }
@@ -73,7 +74,7 @@ public class GameEngine implements ISubject, Runnable {
         while (!actionsQueue.isEmpty()) {
             PlayerAction action = actionsQueue.poll();
             GameCharacter character = gameState.getCharacterById(action.getClientId());
-            if (character == null) continue;
+            if (character == null || !character.isActive()) continue;
 
             character.updateAnimationState(action.getType());
 
@@ -136,17 +137,21 @@ public class GameEngine implements ISubject, Runnable {
                     deadNpcQueue.add(obj.getId());
                 }
             }
-            gameState.getGameObjects().removeIf(obj -> !obj.isActive());
+            gameState.getGameObjects().removeIf(obj -> !obj.isActive() && !(obj instanceof Hero));
         }
     }
 
     private void handleAutonomousActions() {
         Boss boss = null;
+        List<InteractionPoint> interactionPoints = new ArrayList<>();
+        List<Hero> livingHeroes = new ArrayList<>();
+
         synchronized (gameState) {
             for (GameObject obj : gameState.getGameObjects()) {
-                if (obj instanceof Boss) {
-                    boss = (Boss) obj;
-                }
+                if (obj instanceof Boss) boss = (Boss) obj;
+                if (obj instanceof InteractionPoint && obj.isActive()) interactionPoints.add((InteractionPoint) obj);
+                if (obj instanceof Hero && obj.isActive()) livingHeroes.add((Hero) obj);
+
                 if (obj instanceof NPC) {
                     NPC npc = (NPC) obj;
                     long currentTime = System.currentTimeMillis();
@@ -156,6 +161,17 @@ public class GameEngine implements ISubject, Runnable {
                     }
                 }
             }
+        }
+
+        for (InteractionPoint point : interactionPoints) {
+            boolean heroIsNear = false;
+            for (Hero hero : livingHeroes) {
+                if (point.getBounds().intersects(hero.getBounds())) {
+                    heroIsNear = true;
+                    break;
+                }
+            }
+            point.updateInteraction(heroIsNear, gameState);
         }
 
         if (boss != null && !deadNpcQueue.isEmpty()) {

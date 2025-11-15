@@ -27,11 +27,18 @@ public abstract class GameObject implements Serializable, Cloneable {
     }
 
     public void tick() {
+        if (!active) {
+            velX = 0;
+            velY = 0;
+            return;
+        }
         x += velX;
         y += velY;
     }
 
     public void render(Graphics g, int screenOffset) {
+        if (!active) return;
+
         String currentSkin = animation.getCurrentSkinPath();
         BufferedImage image = ImageLoader.loadImage(currentSkin);
         if (image != null) {

@@ -1,6 +1,8 @@
 package patterns.factory;
 
 import core.GameState;
+import model.InteractionPoint;
+import model.bridge.ReviveHeroEffect;
 import model.characters.Boss;
 import model.characters.GameCharacter;
 import model.characters.Hero;
@@ -9,13 +11,13 @@ import patterns.strategy.CircularAttack;
 import patterns.strategy.MeleeAttackStrategy;
 import patterns.strategy.RangedAttack;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import static core.Main.SCREEN_WIDTH;
 
 public class CharacterFactory {
     private static CharacterFactory instance;
     private final GameState gameState;
     private final AtomicInteger npcIdCounter = new AtomicInteger(100);
+    private final AtomicInteger objectIdCounter = new AtomicInteger(1000);
 
     private CharacterFactory(GameState gameState) {
         this.gameState = gameState;
@@ -73,5 +75,16 @@ public class CharacterFactory {
         NPC npc = new NPC(npcIdCounter.getAndIncrement(), x, y);
         gameState.addGameObject(npc);
         return npc;
+    }
+
+    public void createRevivePoint(Hero deadHero) {
+        InteractionPoint point = new InteractionPoint(
+                objectIdCounter.getAndIncrement(),
+                deadHero.getX(),
+                deadHero.getY(),
+                3000,
+                new ReviveHeroEffect(deadHero.getId())
+        );
+        gameState.addGameObject(point);
     }
 }

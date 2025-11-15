@@ -1,5 +1,6 @@
 package patterns.visitor;
 
+import model.InteractionPoint;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
@@ -10,4 +11,5 @@ public interface GameObjectVisitor {
     void visitBoss(Boss boss);
     void visitProjectile(Projectile projectile);
     void visitNpc(NPC npc);
+    void visitInteractionPoint(InteractionPoint point);
 }

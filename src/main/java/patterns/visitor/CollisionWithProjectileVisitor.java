@@ -1,10 +1,12 @@
 package patterns.visitor;
 
 import core.GameState;
+import model.InteractionPoint;
 import model.Projectile;
 import model.characters.Boss;
 import model.characters.Hero;
 import model.characters.NPC;
+import patterns.factory.CharacterFactory;
 
 public class CollisionWithProjectileVisitor implements GameObjectVisitor {
     private final Projectile projectile;
@@ -21,8 +23,14 @@ public class CollisionWithProjectileVisitor implements GameObjectVisitor {
         if (projectile.getFactionId() == hero.getFactionId()) return;
 
         if (projectile.getBounds().intersects(hero.getBounds())) {
+            boolean wasAlive = hero.isActive();
             hero.takeDamage(projectile.getDamage());
             projectile.setActive(false);
+
+            if (wasAlive && !hero.isActive()) {
+                System.out.printf("[DEBUG] Hero %s died at coordinates X: %.2f, Y: %.2f%n", hero.getName(), hero.getX(), hero.getY());
+                CharacterFactory.getFactory().createRevivePoint(hero);
+            }
         }
     }
 
@@ -50,5 +58,9 @@ public class CollisionWithProjectileVisitor implements GameObjectVisitor {
 
     @Override
     public void visitProjectile(Projectile otherProjectile) {
+    }
+
+    @Override
+    public void visitInteractionPoint(InteractionPoint point) {
     }
 }
