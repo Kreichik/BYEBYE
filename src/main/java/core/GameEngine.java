@@ -4,7 +4,9 @@ import model.GameObject;
 import model.characters.Boss;
 import model.characters.GameCharacter;
 import model.characters.NPC;
+import music.AsyncMusicPlayer;
 import net.PlayerAction;
+import patterns.decorator.BossPhase2Decorator;
 import patterns.observer.IObserver;
 import patterns.observer.ISubject;
 import java.util.ArrayList;
@@ -22,6 +24,10 @@ public class GameEngine implements ISubject, Runnable {
     private volatile boolean running = true;
     private volatile boolean paused = false;
     private final List<Integer> deadNpcQueue = new ArrayList<>();
+
+    private volatile boolean bossPhase2Activated = false;
+    private final AsyncMusicPlayer asyncMusicPlayer = new AsyncMusicPlayer();
+
 
     public GameEngine(GameState gameState) {
         this.gameState = gameState;
@@ -62,6 +68,7 @@ public class GameEngine implements ISubject, Runnable {
     private void tick() {
         processInput();
         if (!paused) {
+            checkAndActivateBossPhase2();
             updateGameObjects();
             checkCollisions();
             handleAutonomousActions();
@@ -163,6 +170,26 @@ public class GameEngine implements ISubject, Runnable {
                 boss.onNpcDied(npcId);
             }
             deadNpcQueue.clear();
+        }
+    }
+
+    private void checkAndActivateBossPhase2() {
+        if (bossPhase2Activated) return;
+
+        Boss boss = null;
+        synchronized (gameState) {
+            boss = (Boss) gameState.getCharacterById(0); // ID босса = 0, как в вашем коде
+        }
+
+        if (boss != null && boss.getHealth() <= boss.getMaxHealth() * 0.5) {
+            BossPhase2Decorator phase2Boss = new BossPhase2Decorator(boss, asyncMusicPlayer);
+
+            synchronized (gameState) {
+                gameState.replaceGameObject(boss.getId(), phase2Boss);
+            }
+
+            bossPhase2Activated = true;
+            System.out.println("✅ Boss replaced with Phase 2 decorator");
         }
     }
 

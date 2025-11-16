@@ -56,4 +56,7 @@ public abstract class GameCharacter extends GameObject {
     public int getMaxHealth() { return MAX_HEALTH; }
     public double getMoveSpeed() { return moveSpeed; }
     public int getFactionId() { return factionId; }
+    public IAttackStrategy getAttackStrategy(){
+        return attackStrategy;
+    }
 }

@@ -6,6 +6,7 @@ import model.characters.Boss;
 import model.characters.Hero;
 import model.characters.NPC;
 import model.GameObject;
+import patterns.decorator.BossPhase2Decorator;
 
 public class CollisionVisitor implements GameObjectVisitor {
     private final GameObject other;

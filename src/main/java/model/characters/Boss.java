@@ -8,7 +8,7 @@ import patterns.visitor.GameObjectVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Boss extends GameCharacter {
+public class Boss extends GameCharacter implements BossBehavior{
     public static final int MAX_NPC_COUNT = 2;
     public static final long NPC_COOLDOWN_ON_DEATH = 5000;
 
